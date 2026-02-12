@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Star, ShoppingCart, Heart, Minus, Plus, ArrowRight, Share2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
+import { useWishlist } from '../context/WishListContext';
 import ProductCard from '../components/ProductCard';
 
 import { useToast } from '../context/ToastContext';

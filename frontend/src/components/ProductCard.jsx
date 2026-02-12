@@ -1,41 +1,53 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
 import { motion } from "framer-motion";
+import { useWishlist } from "../context/WishListContext";
 
 const ProductCard = ({ product }) => {
+    const navigate = useNavigate();
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.4 }}
             whileHover={{ y: -5 }}
-            className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 relative border border-gray-100"
+            className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 border border-gray-100 relative"
         >
             {/* Badges */}
             <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
                 {product.isNew && (
-                    <span className="bg-primary text-white text-xs font-bold px-2 py-1 rounded">
+                    <span className="bg-primary text-white text-xs font-semibold px-2 py-1 rounded">
                         NEW
                     </span>
                 )}
+
                 {product.isBestSeller && (
-                    <span className="bg-accent text-white text-xs font-bold px-2 py-1 rounded">
+                    <span className="bg-accent text-white text-xs font-semibold px-2 py-1 rounded">
                         HOT
                     </span>
                 )}
             </div>
 
-            {/* Wishlist Icon (UI only) */}
+            {/* Wishlist Button */}
             <button
-                className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full flex items-center justify-center bg-white/80 hover:bg-white text-gray-500 hover:text-red-500 transition-colors"
-                title="Wishlist"
+                onClick={() => {
+                    if (isInWishlist(product.id)) {
+                        removeFromWishlist(product.id);
+                    } else {
+                        addToWishlist(product);
+                    }
+                }}
+                title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
+                className={`absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition ${isInWishlist(product.id) ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-red-500'}`}
             >
-                <Heart className="w-4 h-4" />
+                <Heart size={16} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
             </button>
 
-            {/* Image */}
+            {/* Product Image (Main Link) */}
             <Link
                 to={`/product/${product.id}`}
                 className="block relative aspect-[4/5] overflow-hidden bg-gray-100"
@@ -43,45 +55,47 @@ const ProductCard = ({ product }) => {
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
                 />
 
-                {/* Overlay Actions (UI only) */}
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                {/* Hover Actions */}
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
+
+                    {/* Add to cart button */}
                     <button
-                        className="bg-white text-dark p-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 hover:bg-primary hover:text-white"
+                        className="bg-white p-2 rounded-full translate-y-4 group-hover:translate-y-0 transition duration-300 hover:bg-primary hover:text-white"
                         title="Add to Cart"
                     >
                         <ShoppingCart size={20} />
                     </button>
 
-                    <Link
-                        to={`/product/${product.id}`}
-                        className="bg-white text-dark p-2 rounded-full transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300 delay-75 hover:bg-primary hover:text-white"
+                    {/* View Details button (fixed) */}
+                    <button
+                        onClick={() => navigate(`/product/${product.id}`)}
+                        className="bg-white p-2 rounded-full translate-y-4 group-hover:translate-y-0 transition duration-300 delay-75 hover:bg-primary hover:text-white"
                         title="View Details"
                     >
                         <Eye size={20} />
-                    </Link>
+                    </button>
+
                 </div>
             </Link>
 
-            {/* Info */}
+            {/* Product Info */}
             <div className="p-4">
-                <div className="text-xs text-gray-500 mb-1">{product.category}</div>
+                <p className="text-xs text-gray-500 mb-1">{product.category}</p>
 
                 <Link
                     to={`/product/${product.id}`}
-                    className="block text-lg font-semibold text-dark hover:text-primary transition-colors mb-2 truncate"
+                    className="block text-lg font-semibold text-dark hover:text-primary transition mb-2 truncate"
                 >
                     {product.name}
                 </Link>
 
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium text-gray-700">
-                            {product.rating}
-                        </span>
+                    <div className="flex items-center gap-1 text-yellow-500">
+                        <Star size={16} fill="currentColor" />
+                        <span className="text-sm text-gray-700">{product.rating}</span>
                     </div>
 
                     <span className="text-xl font-bold text-primary">
