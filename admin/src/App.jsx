@@ -1,9 +1,50 @@
-import React from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import AdminLayout from './layouts/AdminLayout';
+import Dashboard from './pages/Dashboard';
+import Products from './pages/Products';
+import Orders from './pages/Orders';
+import Users from './pages/Users';
+import Payments from './pages/Payments.JSX';
+import Content from './pages/Content';
+import Settings from './pages/Settings';
+import { AdminProvider } from './context/AdminContext';
+import { ProductProvider } from './context/ProductContext';
+import { OrderProvider } from './context/OrderContext';
+import { UserProvider } from './context/UserContext';
+import { PaymentProvider } from './context/PaymentContext';
+import Login from './pages/Login';
+// Placeholder components
+const Placeholder = ({ title }) => <div className="text-2xl font-bold text-gray-400 p-10">{title} Page Coming Soon</div>;
 
-const App = () => {
+function App() {
   return (
-    <div className='underline text-3xl'>App</div>
-  )
+    <Router>
+      <AdminProvider>
+        <ProductProvider>
+          <OrderProvider>
+            <UserProvider>
+              <PaymentProvider>
+                <Routes>
+                  <Route path="/admin/login" element={<Login />} />
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="orders" element={<Orders />} />
+                    <Route path="users" element={<Users />} />
+                    <Route path="payments" element={<Payments />} />
+                    <Route path="content" element={<Content />} />
+                    <Route path="settings" element={<Settings />} />
+                  </Route>
+                  {/* Redirect root to admin dashboard for now if accessed directly */}
+                  <Route path="/" element={<Navigate to="/admin" replace />} />
+                </Routes>
+              </PaymentProvider>
+            </UserProvider>
+          </OrderProvider>
+        </ProductProvider>
+      </AdminProvider>
+    </Router>
+  );
 }
 
-export default App
+export default App;
