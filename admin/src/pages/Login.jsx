@@ -1,16 +1,21 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import axios from 'axios';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, password });
-
+    try {
+      const response = await axios.post('/api/login', { email, password });
+      console.log(response.data);
+    } catch (error) {
+      console.error("Login Error", error);
+    }
   };
 
   return (
@@ -94,7 +99,7 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input-field pl-10 py-3 bg-white"
+                    className="input-field py-3 bg-white pl-[40px]"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -103,7 +108,7 @@ const Login = () => {
               {/* Password Field */}
               <div className="relative group">
                 <div className="flex items-center justify-between mb-1 ml-1">
-                  <label htmlFor="password" class="block text-sm font-medium text-gray-700">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                     Password
                   </label>
                   <div className="text-sm">
@@ -143,7 +148,7 @@ const Login = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="btn-primary w-full py-3 text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30"
+              className="btn-primary w-full py-3 text-lg shadow-lg shadow-primary/20 hover:shadow-primary/30 flex items-center justify-center gap-2"
             >
               Sign in <ArrowRight size={20} />
             </motion.button>
