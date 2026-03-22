@@ -2,19 +2,29 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/login', { email, password });
-      console.log(response.data);
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}/api/admin/login`, { email, password });
+      console.log(response);
+      if (response.data.success) {
+        localStorage.setItem("adminToken", response.data.token);
+        alert("Login Successful");
+        navigate("/");
+      }
     } catch (error) {
       console.error("Login Error", error);
+      if (!error.response.data.success) {
+        alert(error.response.data.message);
+      }
     }
   };
 
@@ -67,7 +77,7 @@ const Login = () => {
         className="flex-1 flex items-center justify-center p-6 sm:p-12 relative"
       >
 
-        <div className="lg:hidden absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-gradient-to-br from-gray-50 to-gray-200">
+        <div className="lg:hidden absolute top-0 left-0 w-full h-full overflow-hidden -z-10 bg-linear-to-br from-gray-50 to-gray-200">
           <div className="absolute top-[-20%] right-[-20%] w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
         </div>
 

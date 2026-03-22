@@ -6,7 +6,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear admin session
+    localStorage.removeItem("adminToken");
     navigate('/admin/login');
   };
 

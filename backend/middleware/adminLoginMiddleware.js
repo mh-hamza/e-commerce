@@ -11,13 +11,13 @@ const adminLoginMiddleware = async (req, res, next) => {
   const { email, password } = req.body;
 
   if (email !== ADMIN_EMAIL) {
-    return res.status(401).json({ message: "Invalid admin email" });
+    return res.status(401).json({ success: false, message: "Invalid admin email" });
   }
 
   const isMatch = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
 
   if (!isMatch) {
-    return res.status(401).json({ message: "Invalid admin password" });
+    return res.status(401).json({ success: false, message: "Invalid admin password" });
   }
 
   next();
@@ -27,7 +27,7 @@ const adminVerifyMiddleware = async (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({ success: false, message: "Auth Header Missing" })
   }
-  const token = authHeader.split(" ")[0];
+  const token = authHeader.split(" ")[1];
   // console.log(token)
 
   if (!token) {

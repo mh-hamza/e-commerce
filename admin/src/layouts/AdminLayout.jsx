@@ -1,8 +1,30 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const AdminLayout = () => {
+  const navigate = useNavigate();
+  const verifyAdmin = async () => {
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_API_URL}/api/admin/verify`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        },
+      });
+      console.log(response);
+      if (!response.data.success) {
+        navigate("/admin/login");
+      }
+    } catch (error) {
+      console.error("Login Error", error);
+      navigate("/admin/login");
+    }
+  };
+  useEffect(() => {
+    verifyAdmin();
+  }, []);
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
