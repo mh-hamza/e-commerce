@@ -13,6 +13,7 @@ import { OrderProvider } from './context/OrderContext';
 import { UserProvider } from './context/UserContext';
 import { PaymentProvider } from './context/PaymentContext';
 import Login from './pages/Login';
+import ProductForm from './components/ProductForm';
 // Placeholder components
 const Placeholder = ({ title }) => <div className="text-2xl font-bold text-gray-400 p-10">{title} Page Coming Soon</div>;
 
@@ -34,6 +35,7 @@ function App() {
                     <Route path="payments" element={<Payments />} />
                     <Route path="content" element={<Content />} />
                     <Route path="settings" element={<Settings />} />
+                    <Route path='products/add' element={<ProductForm />} />
                   </Route>
                   {/* Redirect root to admin dashboard for now if accessed directly */}
                   <Route path="/" element={<Navigate to="/admin" replace />} />

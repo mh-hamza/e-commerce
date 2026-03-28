@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Plus, Search, Filter, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 import ProductForm from '../components/ProductForm';
+import {Link} from 'react-router-dom'
 
 const Products = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
@@ -52,7 +53,7 @@ const Products = () => {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
         >
           <Plus size={20} />
-          <span>Add Product</span>
+          <Link to="/admin/products/add"><span>Add Product</span></Link>
         </button>
       </div>
 
@@ -173,16 +174,6 @@ const Products = () => {
           </table>
         </div>
       </div>
-
-      <ProductForm
-        isOpen={isFormOpen}
-        onClose={() => {
-          setIsFormOpen(false);
-          setEditingProduct(null);
-        }}
-        onSubmit={handleFormSubmit}
-        initialData={editingProduct}
-      />
     </div>
   );
 };
