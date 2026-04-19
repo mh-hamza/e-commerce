@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, Plus, X, Tag, DollarSign, Box, Star, CheckCircle } from 'lucide-react';
-import axios from "axios"
+import axios from "axios";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useProducts } from '../context/ProductContext';
+
 const ProductForm = ({ initialData, onSubmit }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { fetchProducts } = useProducts();
+  const productToEdit = location.state?.product || initialData;
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
@@ -16,19 +24,19 @@ const ProductForm = ({ initialData, onSubmit }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (initialData) {
-      setName(initialData.name || '');
-      setDescription(initialData.description || '');
-      setPrice(initialData.price || 0);
-      setCategory(initialData.category || '');
-      setImage(initialData.image || '');
-      setImages(initialData.images?.length ? initialData.images : ['']);
-      setStock(initialData.stock || 0);
-      setRating(initialData.rating || 0);
-      setIsBestSeller(initialData.isBestSeller || false);
-      setIsNew(initialData.isNew || false);
+    if (productToEdit) {
+      setName(productToEdit.name || '');
+      setDescription(productToEdit.description || '');
+      setPrice(productToEdit.price || 0);
+      setCategory(productToEdit.category || '');
+      setImage(productToEdit.image || '');
+      setImages(productToEdit.images?.length ? productToEdit.images : ['']);
+      setStock(productToEdit.stock || 0);
+      setRating(productToEdit.rating || 0);
+      setIsBestSeller(productToEdit.isBestSeller || false);
+      setIsNew(productToEdit.isNew || false);
     }
-  }, [initialData]);
+  }, [productToEdit]);
 
   const handleImageChange = (index, value) => {
     const updatedImages = [...images];
@@ -66,27 +74,40 @@ const ProductForm = ({ initialData, onSubmit }) => {
         isNew,
       };
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API_URL}/api/product/create`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (productToEdit) {
+        await axios.put(
+          `${import.meta.env.VITE_BACKEND_API_URL}/api/product/update/${productToEdit.id}`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        alert("Product updated successfully!");
+      } else {
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_API_URL}/api/product/create`,
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        alert("Product created successfully!");
+        console.log(response.data);
+      }
 
-
-      alert("✅ Product created successfully!");
-
-      console.log(response.data);
+      await fetchProducts();
+      navigate('/admin/products');
 
     } catch (err) {
       console.error("Error saving product:", err);
 
       alert(
         err.response?.data?.message ||
-        " Failed to create product"
+        " Failed to save product"
       );
 
       setError(err.response?.data?.message);
@@ -101,7 +122,7 @@ const ProductForm = ({ initialData, onSubmit }) => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-5 gap-4">
           <div>
             <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-              {initialData ? 'Edit Product' : 'Create New Product'}
+              {productToEdit ? 'Edit Product' : 'Create New Product'}
             </h2>
             <p className="text-sm text-gray-500 mt-1">Fill in the product details below</p>
           </div>

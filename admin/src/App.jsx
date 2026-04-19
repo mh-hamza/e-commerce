@@ -36,8 +36,8 @@ function App() {
                     <Route path="content" element={<Content />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path='products/add' element={<ProductForm />} />
+                    <Route path='products/edit/:id' element={<ProductForm />} />
                   </Route>
-                  {/* Redirect root to admin dashboard for now if accessed directly */}
                   <Route path="/" element={<Navigate to="/admin" replace />} />
                 </Routes>
               </PaymentProvider>

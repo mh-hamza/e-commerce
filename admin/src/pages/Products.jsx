@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import { Plus, Search, Filter, Edit2, Trash2, MoreVertical } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 import ProductForm from '../components/ProductForm';
-import {Link} from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom';
 
 const Products = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
+  const { products, deleteProduct } = useProducts();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const navigate = useNavigate();
 
   const handleEdit = (product) => {
-    setEditingProduct(product);
-    setIsFormOpen(true);
+    navigate(`/admin/products/edit/${product.id}`, { state: { product } });
   };
 
   const handleDelete = (id) => {
@@ -22,14 +20,7 @@ const Products = () => {
     }
   };
 
-  const handleFormSubmit = (data) => {
-    if (editingProduct) {
-      updateProduct(editingProduct.id, data);
-    } else {
-      addProduct(data);
-    }
-    setEditingProduct(null);
-  };
+
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
@@ -46,14 +37,11 @@ const Products = () => {
           <p className="text-gray-500 text-sm mt-1">Manage your product inventory</p>
         </div>
         <button
-          onClick={() => {
-            setEditingProduct(null);
-            setIsFormOpen(true);
-          }}
+          onClick={() => navigate('/admin/products/add')}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
         >
           <Plus size={20} />
-          <Link to="/admin/products/add"><span>Add Product</span></Link>
+          <span>Add Product</span>
         </button>
       </div>
 
