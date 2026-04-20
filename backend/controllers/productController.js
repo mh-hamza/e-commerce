@@ -1,4 +1,18 @@
 import Product from "../models/product.model.js";
+import cloudinary from "../config/cloudinary.js";
+
+const uploadToCloudinary = (buffer) => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "ecommerce_products" },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+    uploadStream.end(buffer);
+  });
+};
 
 const createProduct = async (req, res) => {
   try {
@@ -7,15 +21,33 @@ const createProduct = async (req, res) => {
       description,
       price,
       category,
-      image,
-      images,
       stock,
       rating,
       isBestSeller,
       isNewProduct,
     } = req.body;
 
-    if (!name || !description || !price || !category || !image) {
+    let imageUrl = req.body.image || "";
+    if (req.files && req.files['image']) {
+      imageUrl = await uploadToCloudinary(req.files['image'][0].buffer);
+    }
+
+    let uploadedImagesUrls = [];
+    if (req.body.images) {
+      if (Array.isArray(req.body.images)) {
+        uploadedImagesUrls = [...req.body.images].filter(Boolean);
+      } else {
+        uploadedImagesUrls = [req.body.images];
+      }
+    }
+
+    if (req.files && req.files['images']) {
+      const uploadPromises = req.files['images'].map(file => uploadToCloudinary(file.buffer));
+      const newImagesUrls = await Promise.all(uploadPromises);
+      uploadedImagesUrls = [...uploadedImagesUrls, ...newImagesUrls];
+    }
+
+    if (!name || !description || !price || !category || !imageUrl) {
       return res.status(400).json({
         success: false,
         message: "Required fields missing",
@@ -27,12 +59,12 @@ const createProduct = async (req, res) => {
       description,
       price,
       category,
-      image,
-      images,
+      image: imageUrl,
+      images: uploadedImagesUrls,
       stock,
       rating,
-      isBestSeller,
-      isNewProduct,
+      isBestSeller: isBestSeller === 'true' || isBestSeller === true,
+      isNewProduct: isNewProduct === 'true' || isNewProduct === true,
     });
 
     res.status(201).json({
@@ -57,9 +89,30 @@ const getAllProducts = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    const updateData = { ...req.body };
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, req.body, { new: true });
+    if (req.files && req.files['image']) {
+      updateData.image = await uploadToCloudinary(req.files['image'][0].buffer);
+    }
 
+    let uploadedImagesUrls = [];
+    if (req.body.images) {
+      if (Array.isArray(req.body.images)) {
+        uploadedImagesUrls = [...req.body.images].filter(Boolean);
+      } else {
+        uploadedImagesUrls = [req.body.images];
+      }
+    }
+
+    if (req.files && req.files['images']) {
+      const uploadPromises = req.files['images'].map(file => uploadToCloudinary(file.buffer));
+      const newImagesUrls = await Promise.all(uploadPromises);
+      uploadedImagesUrls = [...uploadedImagesUrls, ...newImagesUrls];
+    }
+
+    updateData.images = uploadedImagesUrls;
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
 
     if (!updatedProduct) {
       return res.status(404).json({

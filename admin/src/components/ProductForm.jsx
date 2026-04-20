@@ -14,8 +14,9 @@ const ProductForm = ({ initialData, onSubmit }) => {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [category, setCategory] = useState('');
-  const [image, setImage] = useState('');
-  const [images, setImages] = useState(['']);
+  const [imagePreview, setImagePreview] = useState('');
+  const [imageFile, setImageFile] = useState(null);
+  const [images, setImages] = useState([]);
   const [stock, setStock] = useState(0);
   const [rating, setRating] = useState(0);
   const [isBestSeller, setIsBestSeller] = useState(false);
@@ -29,8 +30,13 @@ const ProductForm = ({ initialData, onSubmit }) => {
       setDescription(productToEdit.description || '');
       setPrice(productToEdit.price || 0);
       setCategory(productToEdit.category || '');
-      setImage(productToEdit.image || '');
-      setImages(productToEdit.images?.length ? productToEdit.images : ['']);
+      setImagePreview(productToEdit.image || '');
+
+      const existingGallery = productToEdit.images?.length
+        ? productToEdit.images.map(url => ({ file: null, preview: url }))
+        : [];
+      setImages(existingGallery);
+
       setStock(productToEdit.stock || 0);
       setRating(productToEdit.rating || 0);
       setIsBestSeller(productToEdit.isBestSeller || false);
@@ -38,14 +44,25 @@ const ProductForm = ({ initialData, onSubmit }) => {
     }
   }, [productToEdit]);
 
-  const handleImageChange = (index, value) => {
-    const updatedImages = [...images];
-    updatedImages[index] = value;
-    setImages(updatedImages);
+  const handleMainImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleGalleryImageChange = (index, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const updatedImages = [...images];
+      updatedImages[index] = { file, preview: URL.createObjectURL(file) };
+      setImages(updatedImages);
+    }
   };
 
   const addImageField = () => {
-    setImages((prev) => [...prev, '']);
+    setImages((prev) => [...prev, { file: null, preview: '' }]);
   };
 
   const removeImageField = (index) => {
@@ -61,26 +78,38 @@ const ProductForm = ({ initialData, onSubmit }) => {
     try {
       const token = localStorage.getItem("adminToken");
 
-      const payload = {
-        name,
-        description,
-        price: Number(price),
-        category,
-        image,
-        images: images.filter((img) => img.trim() !== ""),
-        stock: Number(stock),
-        rating: Number(rating),
-        isBestSeller,
-        isNew,
-      };
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('description', description);
+      formData.append('price', Number(price));
+      formData.append('category', category);
+      formData.append('stock', Number(stock));
+      formData.append('rating', Number(rating));
+      formData.append('isBestSeller', isBestSeller);
+      formData.append('isNewProduct', isNew);
+
+      if (imageFile) {
+        formData.append('image', imageFile);
+      } else if (imagePreview) {
+        formData.append('image', imagePreview);
+      }
+
+      images.forEach((img) => {
+        if (img.file) {
+          formData.append('images', img.file);
+        } else if (img.preview && img.preview.trim() !== '') {
+          formData.append('images', img.preview);
+        }
+      });
 
       if (productToEdit) {
         await axios.put(
-          `${import.meta.env.VITE_BACKEND_API_URL}/api/product/update/${productToEdit.id}`,
-          payload,
+          `${import.meta.env.VITE_BACKEND_API_URL}/api/product/update/${productToEdit._id || productToEdit.id}`,
+          formData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
@@ -88,10 +117,11 @@ const ProductForm = ({ initialData, onSubmit }) => {
       } else {
         const response = await axios.post(
           `${import.meta.env.VITE_BACKEND_API_URL}/api/product/create`,
-          payload,
+          formData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
+              'Content-Type': 'multipart/form-data',
             },
           }
         );
@@ -287,11 +317,11 @@ const ProductForm = ({ initialData, onSubmit }) => {
                 Main Display Image
               </label>
               <div className="group relative h-56 w-full rounded-2xl overflow-hidden border-2 border-dashed border-gray-200 bg-gray-50/50 hover:bg-gray-50 transition-colors flex flex-col items-center justify-center">
-                {image ? (
+                {imagePreview ? (
                   <>
-                    <img src={image} alt="Main" className="object-cover h-full w-full" onError={(e) => e.target.style.display = 'none'} />
+                    <img src={imagePreview} alt="Main" className="object-cover h-full w-full" onError={(e) => e.target.style.display = 'none'} />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                      <span className="text-white text-sm font-medium font-medium px-4 py-2 border border-white/40 rounded-lg">Change Image URL below</span>
+                      <span className="text-white text-sm font-medium px-4 py-2 border border-white/40 rounded-lg">Upload new image below</span>
                     </div>
                   </>
                 ) : (
@@ -299,19 +329,18 @@ const ProductForm = ({ initialData, onSubmit }) => {
                     <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mx-auto mb-3 shadow-sm border border-gray-100">
                       <Upload className="text-gray-400" size={20} />
                     </div>
-                    <p className="text-sm font-medium text-gray-600">Provide image URL</p>
+                    <p className="text-sm font-medium text-gray-600">Select an image file</p>
                     <p className="text-xs text-gray-400 mt-1">High quality image recommended</p>
                   </div>
                 )}
               </div>
               <input
-                type="url"
+                type="file"
+                accept="image/*"
                 name="image"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="https://..."
-                className="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all placeholder:text-gray-400 text-sm"
-                required
+                onChange={handleMainImageChange}
+                className="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gray-900 file:text-white hover:file:bg-gray-800"
+                required={!imagePreview}
               />
             </div>
 
@@ -328,11 +357,11 @@ const ProductForm = ({ initialData, onSubmit }) => {
               </div>
 
               <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-                {images.map((imgUrl, idx) => (
+                {images.map((img, idx) => (
                   <div key={idx} className="flex gap-2 items-center group/input">
                     <div className="w-10 h-10 rounded-lg border border-gray-200 bg-gray-50 flex-shrink-0 overflow-hidden relative shadow-sm">
-                      {imgUrl ? (
-                        <img src={imgUrl} alt="" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
+                      {img.preview ? (
+                        <img src={img.preview} alt="" className="w-full h-full object-cover" onError={(e) => e.target.style.display = 'none'} />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">
                           <Upload size={14} />
@@ -340,11 +369,10 @@ const ProductForm = ({ initialData, onSubmit }) => {
                       )}
                     </div>
                     <input
-                      type="url"
-                      value={imgUrl}
-                      onChange={(e) => handleImageChange(idx, e.target.value)}
-                      placeholder="https:// image url..."
-                      className="flex-1 px-4 py-2 border border-gray-200 bg-gray-50/50 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all text-sm placeholder:text-gray-400"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleGalleryImageChange(idx, e)}
+                      className="flex-1 px-4 py-2 border border-gray-200 bg-gray-50/50 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-medium file:bg-gray-200 file:text-gray-700 hover:file:bg-gray-300 text-gray-500"
                     />
                     <button
                       type="button"
