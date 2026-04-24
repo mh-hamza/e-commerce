@@ -49,7 +49,7 @@ const ProductCard = ({ product }) => {
 
             {/* Product Image (Main Link) */}
             <Link
-                to={`/product/${product.id}`}
+                to={`/product/${product._id}`}
                 className="block relative aspect-[4/5] overflow-hidden bg-gray-100"
             >
                 <img

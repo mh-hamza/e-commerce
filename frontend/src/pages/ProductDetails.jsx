@@ -12,7 +12,7 @@ import { useToast } from '../context/ToastContext';
 const ProductDetails = () => {
     const { products } = useData();
     const { id } = useParams();
-    const product = products.find(p => p.id === parseInt(id));
+    const product = products.find(p => p._id === id);
 
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useCart();
@@ -157,7 +157,7 @@ const ProductDetails = () => {
                         </div>
                     </div>
 
-                    {/* Additional Info (Dummy) */}
+                    {/* Additional Info */}
                     <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 pt-4">
                         <div>
                             <span className="block font-bold text-dark mb-1">SKU</span>
