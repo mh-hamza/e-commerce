@@ -123,7 +123,7 @@ const Home = () => {
                             <input
                                 type="email"
                                 placeholder="Enter your email"
-                                className="flex-1 px-6 py-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent border"
+                                className="flex-1 px-6 py-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent border border-gray-200 bg-neutral"
                             />
                             <button type="submit" className="bg-dark text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-colors">
                                 Subscribe
