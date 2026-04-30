@@ -6,7 +6,7 @@ import { useData } from '../context/DataContext';
 import ProductCard from '../components/ProductCard';
 
 const Home = () => {
-    const { products, categories, features } = useData();
+    const { products, features, categories } = useData();
     const featuredProducts = products.filter(p => p.isBestSeller).slice(0, 4);
 
     return (
@@ -61,14 +61,14 @@ const Home = () => {
                             transition={{ delay: index * 0.1 }}
                             className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer"
                         >
-                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
-                            <div className="absolute bottom-6 left-6 text-white">
-                                <Link to={`/shop?category=${cat.name}`}>
+                            <Link to={`/shop?category=${cat.name}`}>
+                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
+                                <div className="absolute bottom-6 left-6 text-white">
                                     <h3 className="text-2xl font-bold mb-1">{cat.name}</h3>
                                     <span className="text-sm opacity-90 group-hover:translate-x-2 transition-transform inline-block">{cat.count}</span>
-                                </Link>
-                            </div>
+                                </div>
+                            </Link>
                         </motion.div>
                     ))}
                 </div>
@@ -123,7 +123,7 @@ const Home = () => {
                             <input
                                 type="email"
                                 placeholder="Enter your email"
-                                className="flex-1 px-6 py-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent"
+                                className="flex-1 px-6 py-4 rounded-full text-dark focus:outline-none focus:ring-2 focus:ring-accent border"
                             />
                             <button type="submit" className="bg-dark text-white px-8 py-4 rounded-full font-bold hover:bg-gray-900 transition-colors">
                                 Subscribe

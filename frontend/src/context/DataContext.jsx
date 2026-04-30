@@ -1,11 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { Truck, Shield, Clock, RefreshCw } from 'lucide-react';
+import sofaImg from '../assets/sofa-img.avif';
+import bedImg from '../assets/bed-img.jpg';
+import chairImg from '../assets/chair-img.jfif';
+import tableImg from '../assets/table-img.avif';
 
 const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
+    const [sofaCount, setSofaCount] = useState(0);
+    const [bedCount, setBedCount] = useState(0);
+    const [chairCount, setChairCount] = useState(0);
+    const [tableCount, setTableCount] = useState(0);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -22,17 +30,40 @@ export const DataProvider = ({ children }) => {
         };
         fetchProducts();
     }, []);
-    console.log("--------------------", products);
+
+    useEffect(() => {
+        let sofa = 0;
+        let bed = 0;
+        let chair = 0;
+        let table = 0;
+
+        products.forEach(product => {
+            if (!product.category) return;
+
+            if (product.category === 'Sofa') sofa++;
+            else if (product.category === 'Bed') bed++;
+            else if (product.category === 'Chair') chair++;
+            else if (product.category === 'Table') table++;
+        });
+
+        setSofaCount(sofa);
+        setBedCount(bed);
+        setChairCount(chair);
+        setTableCount(table);
+    }, [products]);
+
+    // console.log("produtcs", products);
+
     const reviews = [
         { id: 1, user: "Sarah L.", rating: 5, comment: "Absolutely love this sofa! So comfy." },
         { id: 2, user: "Mike R.", rating: 4, comment: "Great quality, fast delivery." }
     ];
 
     const categories = [
-        { name: 'Sofa', image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&q=80&w=2070', count: '12 Items' },
-        { name: 'Bed', image: 'https://images.unsplash.com/photo-1505693416388-b03463126db1?auto=format&fit=crop&q=80&w=2070', count: '8 Items' },
-        { name: 'Chair', image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?auto=format&fit=crop&q=80&w=2787', count: '15 Items' },
-        { name: 'Table', image: 'https://images.unsplash.com/photo-1577140917170-285929fb55b7?auto=format&fit=crop&q=80&w=2304', count: '10 Items' },
+        { name: 'Sofa', image: sofaImg, count: `${sofaCount} Items` },
+        { name: 'Bed', image: bedImg, count: `${bedCount} Items` },
+        { name: 'Chair', image: chairImg, count: `${chairCount} Items` },
+        { name: 'Table', image: tableImg, count: `${tableCount} Items` },
     ];
 
     const features = [
