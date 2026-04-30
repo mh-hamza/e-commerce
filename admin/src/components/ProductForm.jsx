@@ -235,15 +235,23 @@ const ProductForm = ({ initialData, onSubmit }) => {
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-gray-700">Category</label>
-                <input
-                  type="text"
+                <select
                   name="category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  placeholder="e.g. Sofa"
-                  className="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all placeholder:text-gray-400"
+                  className="w-full px-4 py-2.5 bg-gray-50/50 border border-gray-200 rounded-xl focus:bg-white focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 focus:outline-none transition-all"
                   required
-                />
+                >
+                  <option value="" disabled>Select a category</option>
+                  <option value="Chair">Chair</option>
+                  <option value="Sofa">Sofa</option>
+                  <option value="Table">Table</option>
+                  <option value="Bed">Bed</option>
+                  <option value="Wardrobe">Wardrobe</option>
+                  <option value="Officefurniture">Officefurniture</option>
+                  <option value="Kidsfurniture">Kidsfurniture</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
             </div>
 
