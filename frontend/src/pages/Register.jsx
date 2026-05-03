@@ -1,28 +1,37 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-//import { useAuth } from '../context/AuthContext';
-import { User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { User, Mail, Lock, ArrowRight, Phone } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 const Register = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // const { register } = useAuth();
-    // const navigate = useNavigate();
+    const [phone, setPhone] = useState('');
+    const { registerUser } = useAuth();
+    const navigate = useNavigate();
+    const { addToast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
-        // e.preventDefault();
-        // setIsLoading(true);
-        // // Simulate network delay
-        // setTimeout(() => {
-        //     const success = register(name, email, password);
-        //     setIsLoading(false);
-        //     if (success) {
-        //         navigate('/');
-        //     }
-        // }, 1000);
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const data = await registerUser(name, email, password, phone);
+            
+            if (data.success) {
+                addToast("Registration successful! Please login.", "success");
+                navigate('/login');
+            } else {
+                addToast(data.error || data.message || "Registration failed", "error");
+            }
+        } catch (error) {
+            addToast(error.response?.data?.error || "Error registering user", "error");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -49,6 +58,21 @@ const Register = () => {
                                 required
                                 className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                                 placeholder="John Doe"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Email Address</label>
+                        <div className="relative">
+                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                            <input
+                                type="text"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                required
+                                className="w-full pl-12 pr-4 py-3 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+                                placeholder="Phone number"
                             />
                         </div>
                     </div>

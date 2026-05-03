@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -12,28 +12,51 @@ import Checkout from './pages/Checkout'
 import Shop from './pages/Shop'
 import MainLayout from './layout/MainLayout'
 import { DataProvider } from './context/DataContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProductDetails from './pages/ProductDetails';
+
+const ProtectedRoute = () => {
+  const { user, isAuthLoading } = useAuth();
+  if (isAuthLoading) return <div className="min-h-[60vh] flex items-center justify-center">Loading...</div>;
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
+};
+
+const GuestRoute = () => {
+  const { user, isAuthLoading } = useAuth();
+  if (isAuthLoading) return <div className="min-h-[60vh] flex items-center justify-center">Loading...</div>;
+  return user ? <Navigate to="/" replace /> : <Outlet />;
+};
+
 function App() {
 
 
   return (
     <>
-      <DataProvider>
-        <Routes>
-          <Route path='/' element={<MainLayout />}>
-            <Route index element={<Home />} />
-            <Route path='about' element={<About />} />
-            <Route path='contact' element={<Contact />} />
-            <Route path='login' element={<Login />} />
-            <Route path='register' element={<Register />} />
-            <Route path='cart' element={<Cart />} />
-            <Route path='wishlist' element={<WishList />} />
-            <Route path='checkout' element={<Checkout />} />
-            <Route path='shop' element={<Shop />} />
-            <Route path="product/:id" element={<ProductDetails />} />
-          </Route>
-        </Routes>
-      </DataProvider>
+      <AuthProvider>
+        <DataProvider>
+          <Routes>
+            <Route path='/' element={<MainLayout />}>
+              <Route index element={<Home />} />
+              <Route path='about' element={<About />} />
+              <Route path='contact' element={<Contact />} />
+              <Route element={<GuestRoute />}>
+                <Route path='login' element={<Login />} />
+                <Route path='register' element={<Register />} />
+              </Route>
+
+              <Route path='cart' element={<Cart />} />
+              <Route path='wishlist' element={<WishList />} />
+              <Route path='shop' element={<Shop />} />
+
+              <Route element={<ProtectedRoute />}>
+                <Route path='checkout' element={<Checkout />} />
+                <Route path='profile' element={<div className="min-h-[60vh] flex items-center justify-center text-2xl font-bold">User Profile</div>} />
+              </Route>
+              <Route path="product/:id" element={<ProductDetails />} />
+            </Route>
+          </Routes>
+        </DataProvider>
+      </AuthProvider>
     </>
   )
 }

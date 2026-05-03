@@ -11,7 +11,7 @@ const authMiddleware = async (req, res, next) => {
     if (!authHeader) {
       return res.status(401).json({ success: false, message: "Auth Header Missing" })
     }
-    const token = authHeader.split(" ")[0];
+    const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
     // console.log(token)
 
     if (!token) {

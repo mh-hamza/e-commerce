@@ -1,27 +1,34 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-// import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // const { login } = useAuth();
-    // const navigate = useNavigate();
+    const { login } = useAuth();
+    const navigate = useNavigate();
+    const { addToast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
-        //     e.preventDefault();
-        //     setIsLoading(true);
-        //     // Simulate network delay
-        //     setTimeout(() => {
-        //         const success = login(email, password);
-        //         setIsLoading(false);
-        //         if (success) {
-        //             navigate('/');
-        //         }
-        //     }, 1000);
+        e.preventDefault();
+        setIsLoading(true);
+        try {
+            const data = await login(email, password);
+            if (data.success) {
+                addToast("Login successful!", "success");
+                navigate('/');
+            } else {
+                addToast(data.message || data.error || "Login failed", "error");
+            }
+        } catch (error) {
+            addToast(error.response?.data?.message || error.response?.data?.error || "Error logging in", "error");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (

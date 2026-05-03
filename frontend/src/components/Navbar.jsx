@@ -1,17 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart, Heart, Menu, X, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWishlist } from '../context/WishListContext';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 
 const Navbar = () => {
-    const isOpen = false;
-    const isUserMenuOpen = false;
+    const [isOpen, setIsOpen] = useState(false);
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { wishlistItems } = useWishlist();
     const { cartItems } = useCart();
+    const { user, logout } = useAuth();
+    const { addToast } = useToast();
     const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-    const user = null;
+
+    const handleLogout = () => {
+        logout();
+        addToast("Logged out successfully", "success");
+    };
 
     const navLinks = [
         { name: 'Home', path: '/' },
@@ -19,6 +27,7 @@ const Navbar = () => {
         { name: 'About', path: '/about' },
         { name: 'Contact', path: '/contact' },
     ];
+    console.log(user)
 
     return (
         <nav className="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">
@@ -67,9 +76,16 @@ const Navbar = () => {
                     <div className="relative">
                         {user ? (
                             <button
+                                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                                 className="flex items-center gap-2 hover:bg-gray-50 p-1 rounded-full transition-colors border border-transparent hover:border-gray-200"
                             >
-                                <img src={user.avatar} alt={user.name} className="w-8 h-8 rounded-full bg-primary" />
+                                {user.profileImage ? (
+                                    <img src={user.profileImage} alt={user.name} className="w-8 h-8 rounded-full bg-primary object-cover" />
+                                ) : (
+                                    <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm uppercase">
+                                        {user.name ? user.name.charAt(0) : <User size={16} />}
+                                    </div>
+                                )}
                             </button>
                         ) : (
                             <Link to="/login" className="hover:text-primary transition-colors">
@@ -83,6 +99,7 @@ const Navbar = () => {
                                 <>
                                     <div
                                         className="fixed inset-0 z-10"
+                                        onClick={() => setIsUserMenuOpen(false)}
                                     ></div>
                                     <motion.div
                                         initial={{ opacity: 0, y: 10, scale: 0.95 }}
@@ -94,8 +111,19 @@ const Navbar = () => {
                                             <p className="font-bold text-dark truncate">{user.name}</p>
                                             <p className="text-xs text-gray-500 truncate">{user.email}</p>
                                         </div>
+                                        <Link
+                                            to="/profile"
+                                            onClick={() => setIsUserMenuOpen(false)}
+                                            className="w-full text-left px-4 py-3 text-sm text-dark hover:bg-gray-50 transition-colors flex items-center gap-2"
+                                        >
+                                            <User size={16} /> Profile
+                                        </Link>
                                         <button
-                                            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                                            onClick={() => {
+                                                setIsUserMenuOpen(false);
+                                                handleLogout();
+                                            }}
+                                            className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2 border-t border-gray-50"
                                         >
                                             <LogOut size={16} /> Sign Out
                                         </button>
@@ -106,6 +134,7 @@ const Navbar = () => {
                     </div>
 
                     <button
+                        onClick={() => setIsOpen(!isOpen)}
                         className="md:hidden hover:text-primary transition-colors"
                     >
                         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -144,6 +173,7 @@ const Navbar = () => {
                             )}
                             {user && (
                                 <button
+                                    onClick={handleLogout}
                                     className="text-lg font-medium text-red-500 text-left"
                                 >
                                     Sign Out
