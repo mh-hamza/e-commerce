@@ -2,12 +2,15 @@ import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ShoppingCart, Heart, Menu, X, User, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWishlist } from '../context/WishListContext';
+import { useCart } from '../context/CartContext';
 
 const Navbar = () => {
     const isOpen = false;
     const isUserMenuOpen = false;
-    const wishlistItems = [];
-    const cartCount = 0;
+    const { wishlistItems } = useWishlist();
+    const { cartItems } = useCart();
+    const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
     const user = null;
 
     const navLinks = [
