@@ -3,10 +3,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
 import { motion } from "framer-motion";
 import { useWishlist } from "../context/WishListContext";
+import { useCart } from "../context/CartContext";
 
 const ProductCard = ({ product }) => {
     const navigate = useNavigate();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+    const { addToCart } = useCart();
+    const productId = product._id || product.id;
 
     return (
         <motion.div
@@ -34,22 +37,23 @@ const ProductCard = ({ product }) => {
 
             {/* Wishlist Button */}
             <button
-                onClick={() => {
-                    if (isInWishlist(product.id)) {
-                        removeFromWishlist(product.id);
+                onClick={(e) => {
+                    e.preventDefault();
+                    if (isInWishlist(productId)) {
+                        removeFromWishlist(productId);
                     } else {
                         addToWishlist(product);
                     }
                 }}
-                title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                className={`absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition ${isInWishlist(product.id) ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-red-500'}`}
+                title={isInWishlist(productId) ? "Remove from Wishlist" : "Add to Wishlist"}
+                className={`absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition ${isInWishlist(productId) ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-red-500'}`}
             >
-                <Heart size={16} fill={isInWishlist(product.id) ? "currentColor" : "none"} />
+                <Heart size={16} fill={isInWishlist(productId) ? "currentColor" : "none"} />
             </button>
 
             {/* Product Image (Main Link) */}
             <Link
-                to={`/product/${product._id}`}
+                to={`/product/${productId}`}
                 className="block relative aspect-[4/5] overflow-hidden bg-gray-100"
             >
                 <img
@@ -63,6 +67,10 @@ const ProductCard = ({ product }) => {
 
                     {/* Add to cart button */}
                     <button
+                        onClick={(e) => {
+                            e.preventDefault();
+                            addToCart(product);
+                        }}
                         className="bg-white p-2 rounded-full translate-y-4 group-hover:translate-y-0 transition duration-300 hover:bg-primary hover:text-white"
                         title="Add to Cart"
                     >
@@ -71,7 +79,7 @@ const ProductCard = ({ product }) => {
 
                     {/* View Details button (fixed) */}
                     <button
-                        onClick={() => navigate(`/product/${product.id}`)}
+                        onClick={(e) => { e.preventDefault(); navigate(`/product/${productId}`); }}
                         className="bg-white p-2 rounded-full translate-y-4 group-hover:translate-y-0 transition duration-300 delay-75 hover:bg-primary hover:text-white"
                         title="View Details"
                     >
@@ -86,7 +94,7 @@ const ProductCard = ({ product }) => {
                 <p className="text-xs text-gray-500 mb-1">{product.category}</p>
 
                 <Link
-                    to={`/product/${product.id}`}
+                    to={`/product/${productId}`}
                     className="block text-lg font-semibold text-dark hover:text-primary transition mb-2 truncate"
                 >
                     {product.name}

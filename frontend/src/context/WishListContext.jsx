@@ -21,17 +21,18 @@ export const WishlistProvider = ({ children }) => {
 
   const addToWishlist = (product) => {
     setWishlistItems(prev => {
-      if (prev.find(item => item.id === product.id)) return prev;
+      const productId = product._id || product.id;
+      if (prev.find(item => (item._id || item.id) === productId)) return prev;
       return [...prev, product];
     });
   };
 
   const removeFromWishlist = (id) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== id));
+    setWishlistItems(prev => prev.filter(item => (item._id || item.id) !== id));
   };
 
   const isInWishlist = (id) => {
-    return wishlistItems.some(item => item.id === id);
+    return wishlistItems.some(item => (item._id || item.id) === id);
   };
 
   const clearWishlist = () => {

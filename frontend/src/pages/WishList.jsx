@@ -34,7 +34,7 @@ const Wishlist = () => {
                 >
                     <AnimatePresence>
                         {wishlistItems.map(item => (
-                            <ProductCard key={item.id} product={item} />
+                            <ProductCard key={item._id || item.id} product={item} />
                         ))}
                     </AnimatePresence>
                 </motion.div>

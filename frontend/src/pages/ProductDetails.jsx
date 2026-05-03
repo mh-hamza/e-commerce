@@ -34,8 +34,9 @@ const ProductDetails = () => {
         return <div className="text-center py-20">Product not found</div>;
     }
 
-    const inWishlist = isInWishlist(product.id);
-    const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+    const productId = product._id || product.id;
+    const inWishlist = isInWishlist(productId);
+    const relatedProducts = products.filter(p => p.category === product.category && (p._id || p.id) !== productId).slice(0, 4);
 
     const handleAddToCart = () => {
         addToCart(product, quantity);
@@ -143,7 +144,7 @@ const ProductDetails = () => {
                             <button
                                 onClick={() => {
                                     if (inWishlist) {
-                                        removeFromWishlist(product.id);
+                                        removeFromWishlist(productId);
                                         addToast("Removed from wishlist", "info");
                                     } else {
                                         addToWishlist(product);
@@ -161,7 +162,7 @@ const ProductDetails = () => {
                     <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 pt-4">
                         <div>
                             <span className="block font-bold text-dark mb-1">SKU</span>
-                            DFS-{product.id}00
+                            DFS-{productId}00
                         </div>
                         <div>
                             <span className="block font-bold text-dark mb-1">Shipping</span>
@@ -177,7 +178,7 @@ const ProductDetails = () => {
                     <h2 className="text-2xl font-bold text-dark mb-8">Related Products</h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {relatedProducts.map(p => (
-                            <ProductCard key={p.id} product={p} />
+                            <ProductCard key={p._id || p.id} product={p} />
                         ))}
                     </div>
                 </div>

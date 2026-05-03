@@ -198,7 +198,7 @@ const Shop = () => {
                         >
                             <AnimatePresence>
                                 {filteredProducts.map(product => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard key={product._id || product.id} product={product} />
                                 ))}
                             </AnimatePresence>
                         </motion.div>

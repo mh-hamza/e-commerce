@@ -32,7 +32,7 @@ const Cart = () => {
                     <AnimatePresence>
                         {cartItems.map((item) => (
                             <motion.div
-                                key={item.id}
+                                key={item._id || item.id}
                                 layout
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
@@ -50,7 +50,7 @@ const Cart = () => {
                                             <h3 className="font-bold text-dark text-lg md:text-xl">{item.name}</h3>
                                         </div>
                                         <button
-                                            onClick={() => removeFromCart(item.id)}
+                                            onClick={() => removeFromCart(item._id || item.id)}
                                             className="text-gray-400 hover:text-red-500 transition-colors"
                                         >
                                             <Trash2 size={20} />
@@ -60,7 +60,7 @@ const Cart = () => {
                                     <div className="flex items-center justify-between mt-4">
                                         <div className="flex items-center border border-gray-200 rounded-lg">
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                onClick={() => updateQuantity(item._id || item.id, item.quantity - 1)}
                                                 className="p-2 hover:text-primary transition-colors disabled:opacity-50"
                                                 disabled={item.quantity <= 1}
                                             >
@@ -68,7 +68,7 @@ const Cart = () => {
                                             </button>
                                             <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
                                             <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                onClick={() => updateQuantity(item._id || item.id, item.quantity + 1)}
                                                 className="p-2 hover:text-primary transition-colors"
                                             >
                                                 <Plus size={16} />
