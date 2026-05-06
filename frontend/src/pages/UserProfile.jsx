@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, Clock } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit2, Save, X, Package, Clock, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
@@ -26,6 +26,7 @@ const Profile = () => {
 
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+    const [trackingOrder, setTrackingOrder] = useState(null); // Added for timeline modal
     const { token } = useAuth();
 
     useEffect(() => {
@@ -290,11 +291,19 @@ const Profile = () => {
                                                 <Clock size={14} /> {new Date(order.createdAt).toLocaleDateString()}
                                             </p>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-lg font-bold text-dark">${order.totalPrice}</p>
-                                            <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mt-1 ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
-                                                {order.status}
-                                            </span>
+                                        <div className="text-right flex items-center gap-4">
+                                            <div>
+                                                <p className="text-lg font-bold text-dark">${order.totalPrice}</p>
+                                                <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mt-1 ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' : order.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                                                    {order.status}
+                                                </span>
+                                            </div>
+                                            <button 
+                                                onClick={() => setTrackingOrder(order)}
+                                                className="ml-4 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium"
+                                            >
+                                                Track Order
+                                            </button>
                                         </div>
                                     </div>
                                     <div className="space-y-3">
@@ -320,6 +329,76 @@ const Profile = () => {
                     )}
                 </div>
             </div>
+
+            {/* Tracking Modal */}
+            <AnimatePresence>
+                {trackingOrder && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+                    >
+                        <motion.div 
+                            initial={{ y: 50, scale: 0.95 }}
+                            animate={{ y: 0, scale: 1 }}
+                            exit={{ y: 50, scale: 0.95 }}
+                            className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden"
+                        >
+                            <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/80">
+                                <h2 className="text-xl font-bold text-gray-800">Track Order</h2>
+                                <button 
+                                    onClick={() => setTrackingOrder(null)}
+                                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+                            
+                            <div className="p-6">
+                                <div className="mb-6 pb-6 border-b border-gray-100 flex justify-between items-center">
+                                    <div>
+                                        <p className="text-sm text-gray-500">Order ID</p>
+                                        <p className="font-bold text-gray-800">#{trackingOrder._id.substring(trackingOrder._id.length - 8).toUpperCase()}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm text-gray-500">Current Status</p>
+                                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mt-1 ${trackingOrder.status === 'Delivered' ? 'bg-green-100 text-green-700' : trackingOrder.status === 'Cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}`}>
+                                            {trackingOrder.status}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">
+                                    {trackingOrder.statusHistory && trackingOrder.statusHistory.length > 0 ? (
+                                        trackingOrder.statusHistory.map((history, index) => (
+                                            <div key={index} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                                                {/* Icon */}
+                                                <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white bg-blue-500 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                                                    <CheckCircle size={16} />
+                                                </div>
+                                                {/* Card */}
+                                                <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+                                                    <div className="flex flex-col">
+                                                        <span className="font-bold text-gray-800">{history.status}</span>
+                                                        <span className="text-xs text-gray-500 mt-1">
+                                                            {new Date(history.date).toLocaleDateString()} at {new Date(history.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-8 text-gray-500">
+                                            No tracking history available yet.
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

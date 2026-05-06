@@ -1,39 +1,60 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 
 const OrderContext = createContext();
 
 export const useOrders = () => useContext(OrderContext);
 
-const initialOrders = [
-  { id: '#ORD-7712', customer: 'John Doe', amount: 120.50, status: 'Delivered', date: '2023-10-15', items: 3 },
-  { id: '#ORD-7711', customer: 'Sarah Smith', amount: 85.00, status: 'Processing', date: '2023-10-14', items: 1 },
-  { id: '#ORD-7710', customer: 'Mike Johnson', amount: 350.20, status: 'Pending', date: '2023-10-14', items: 5 },
-  { id: '#ORD-7709', customer: 'Anna Lee', amount: 65.00, status: 'Delivered', date: '2023-10-13', items: 2 },
-  { id: '#ORD-7708', customer: 'Robert Brown', amount: 210.00, status: 'Cancelled', date: '2023-10-12', items: 4 },
-];
-
 export const OrderProvider = ({ children }) => {
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('orders');
-    return saved ? JSON.parse(saved) : initialOrders;
-  });
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+
+  const fetchOrders = async () => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      if (!adminToken) return;
+
+      setLoadingOrders(true);
+      const res = await axios.get(`${import.meta.env.VITE_BACKEND_API_URL}/api/order/admin`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      if (res.data.success) {
+        setOrders(res.data.orders);
+      }
+    } catch (error) {
+      console.error("Error fetching admin orders:", error);
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
 
   useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }, [orders]);
+    fetchOrders();
+  }, []);
 
-  const updateOrderStatus = (id, newStatus) => {
-    setOrders(orders.map(order =>
-      order.id === id ? { ...order, status: newStatus } : order
-    ));
+  const updateOrderStatus = async (id, newStatus) => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const res = await axios.put(`${import.meta.env.VITE_BACKEND_API_URL}/api/order/admin/${id}/status`, 
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${adminToken}` } }
+      );
+      if (res.data.success) {
+        setOrders(orders.map(order => order._id === id ? { ...order, status: newStatus } : order));
+      }
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      alert("Failed to update status");
+    }
   };
 
   const deleteOrder = (id) => {
-    setOrders(orders.filter(order => order.id !== id));
+    // Optional: implement real backend delete if needed, for now just local filter
+    setOrders(orders.filter(order => order._id !== id));
   };
 
   return (
-    <OrderContext.Provider value={{ orders, updateOrderStatus, deleteOrder }}>
+    <OrderContext.Provider value={{ orders, loadingOrders, updateOrderStatus, deleteOrder, fetchOrders }}>
       {children}
     </OrderContext.Provider>
   );
