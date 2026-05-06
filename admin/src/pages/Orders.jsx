@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useOrders } from '../context/OrderContext';
-import { Eye, CheckCircle, Smartphone, Truck, XCircle, Search, Filter, X, Clock, MapPin, Package } from 'lucide-react';
+import { Eye, CheckCircle, Smartphone, Truck, XCircle, Search, Filter, X, Clock, MapPin, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+
+const ORDERS_PER_PAGE = 20;
 
 const Orders = () => {
   const { orders, loadingOrders, updateOrderStatus } = useOrders();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -23,12 +26,25 @@ const Orders = () => {
     (order.user?.fullName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * ORDERS_PER_PAGE,
+    currentPage * ORDERS_PER_PAGE
+  );
+
+  const handleSearch = (val) => {
+    setSearchTerm(val);
+    setCurrentPage(1); // reset to page 1 on search
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 relative">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
-          <p className="text-gray-500 text-sm mt-1">Manage and track customer orders</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {loadingOrders ? 'Loading...' : `${filteredOrders.length} orders found`}
+          </p>
         </div>
       </div>
 
@@ -40,7 +56,7 @@ const Orders = () => {
               type="text"
               placeholder="Search by ID or Customer name..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
               className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
             />
           </div>
@@ -63,7 +79,7 @@ const Orders = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredOrders.map((order) => (
+                {paginatedOrders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-800">#{order._id.substring(order._id.length - 6).toUpperCase()}</td>
                     <td className="px-6 py-4 text-gray-600">{order.user?.fullName || 'Unknown'}</td>
@@ -96,13 +112,63 @@ const Orders = () => {
                     </td>
                   </tr>
                 ))}
-                {filteredOrders.length === 0 && (
+                {paginatedOrders.length === 0 && (
                   <tr>
                     <td colSpan="7" className="px-6 py-8 text-center text-gray-500">No orders found.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Footer */}
+        {!loadingOrders && totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/40">
+            <p className="text-sm text-gray-500">
+              Page <span className="font-medium text-gray-700">{currentPage}</span> of{' '}
+              <span className="font-medium text-gray-700">{totalPages}</span>
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                .reduce((acc, p, idx, arr) => {
+                  if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                  acc.push(p);
+                  return acc;
+                }, [])
+                .map((item, idx) =>
+                  item === '...' ? (
+                    <span key={`e-${idx}`} className="px-2 text-gray-400 text-sm">...</span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => setCurrentPage(item)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                        item === currentPage
+                          ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+                          : 'border border-gray-200 text-gray-600 hover:bg-white'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         )}
       </div>

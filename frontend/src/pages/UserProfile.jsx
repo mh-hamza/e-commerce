@@ -26,7 +26,7 @@ const Profile = () => {
 
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
-    const [trackingOrder, setTrackingOrder] = useState(null); // Added for timeline modal
+    const [trackingOrder, setTrackingOrder] = useState(null);
     const { token } = useAuth();
 
     useEffect(() => {
@@ -75,12 +75,11 @@ const Profile = () => {
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 overflow-hidden relative">
                         <div className="absolute top-0 left-0 w-full h-24 bg-primary/10"></div>
                         <div className="relative flex flex-col items-center mb-6 mt-4">
-                            <img
-                                src={user.avatar}
-                                alt={user.name}
-                                className="w-24 h-24 rounded-full border-4 border-white shadow-md bg-white mb-4"
-                            />
-                            <h2 className="text-xl font-bold text-dark">{user.name}</h2>
+                            <div className="w-20 h-20 rounded-full bg-primary text-white flex items-center justify-center text-4xl uppercase">
+                                {user.name.charAt(0)}
+                            </div>
+
+                            <h2 className="text-xl font-bold text-dark mt-4">{user.name}</h2>
                             <p className="text-gray-500 text-sm">{user.email}</p>
                         </div>
 
@@ -298,7 +297,7 @@ const Profile = () => {
                                                     {order.status}
                                                 </span>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={() => setTrackingOrder(order)}
                                                 className="ml-4 border border-primary text-primary px-4 py-2 rounded-lg hover:bg-primary hover:text-white transition-colors text-sm font-medium"
                                             >
@@ -333,13 +332,13 @@ const Profile = () => {
             {/* Tracking Modal */}
             <AnimatePresence>
                 {trackingOrder && (
-                    <motion.div 
+                    <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
                     >
-                        <motion.div 
+                        <motion.div
                             initial={{ y: 50, scale: 0.95 }}
                             animate={{ y: 0, scale: 1 }}
                             exit={{ y: 50, scale: 0.95 }}
@@ -347,14 +346,14 @@ const Profile = () => {
                         >
                             <div className="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/80">
                                 <h2 className="text-xl font-bold text-gray-800">Track Order</h2>
-                                <button 
+                                <button
                                     onClick={() => setTrackingOrder(null)}
                                     className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded-full transition-colors"
                                 >
                                     <X size={20} />
                                 </button>
                             </div>
-                            
+
                             <div className="p-6">
                                 <div className="mb-6 pb-6 border-b border-gray-100 flex justify-between items-center">
                                     <div>

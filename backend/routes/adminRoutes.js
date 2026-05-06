@@ -1,6 +1,7 @@
 import express from "express";
 import { adminLoginMiddleware, adminVerifyMiddleware } from "../middleware/adminLoginMiddleware.js";
 import { adminLogin, adminLogout } from "../controllers/adminController.js";
+import { getAllUsersAdmin, toggleBlockUserAdmin } from "../controllers/adminUserController.js";
 
 const router = express.Router();
 
@@ -17,4 +18,9 @@ router.get("/testadmin",
     res.json({ message: "Admin test successful" });
   }
 );
+
+// User management routes
+router.get("/users", adminVerifyMiddleware, getAllUsersAdmin);
+router.put("/users/:id/block", adminVerifyMiddleware, toggleBlockUserAdmin);
+
 export default router;
