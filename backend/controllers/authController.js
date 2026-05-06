@@ -14,7 +14,7 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
     const hashPassword = await bcryptjs.hash(password, 10)
-    const user = await User.create({ fullName, email, phone, password: hashPassword, address });
+    const user = await User.create({ fullName, email, phone, password: hashPassword });
 
     return res.status(201).json({ success: true, message: "User registerd Successfully" })
   } catch (error) {
@@ -53,6 +53,7 @@ const loginUser = async (req, res) => {
         id: existingUser._id,
         name: existingUser.fullName, 
         email: existingUser.email, 
+        mobile: existingUser.phone,
         address: existingUser.address 
       },
     });
@@ -64,6 +65,35 @@ const loginUser = async (req, res) => {
 const verifyUser = async (req, res) => {
   return res.status(200).json({ success: true, message: "User verified successfully", user: req.user })
 }
+
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email, mobile } = req.body;
+    const userId = req.user.id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { fullName: name, email, phone: mobile },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser) return res.status(404).json({ success: false, message: "User not found" });
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.fullName,
+        email: updatedUser.email,
+        mobile: updatedUser.phone,
+        address: updatedUser.address
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error updating profile", error: error.message });
+  }
+};
 
 const updateAddress = async (req, res) => {
   try {
@@ -77,7 +107,7 @@ const updateAddress = async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { address },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!updatedUser) {
@@ -91,6 +121,7 @@ const updateAddress = async (req, res) => {
         id: updatedUser._id,
         name: updatedUser.fullName,
         email: updatedUser.email,
+        mobile: updatedUser.phone,
         address: updatedUser.address
       }
     });
@@ -100,4 +131,4 @@ const updateAddress = async (req, res) => {
   }
 }
 
-export { registerUser, loginUser, verifyUser, updateAddress };
+export { registerUser, loginUser, verifyUser, updateProfile, updateAddress };

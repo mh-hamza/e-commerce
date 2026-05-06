@@ -112,7 +112,7 @@ const updateProduct = async (req, res) => {
 
     updateData.images = uploadedImagesUrls;
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
 
     if (!updatedProduct) {
       return res.status(404).json({

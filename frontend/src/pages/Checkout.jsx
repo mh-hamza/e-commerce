@@ -25,6 +25,7 @@ const Checkout = () => {
         if (user) {
             const [firstName, ...lastNameParts] = (user.name || '').split(' ');
             const lastName = lastNameParts.join(' ');
+            
             setFormData({
                 firstName: firstName || '',
                 lastName: lastName || '',
@@ -49,25 +50,35 @@ const Checkout = () => {
 
         if (user && token) {
             try {
-                await axios.put('http://localhost:5000/api/user/address', {
-                    address: {
+                const orderData = {
+                    orderItems: cartItems.map(item => ({
+                        name: item.name,
+                        qty: item.quantity,
+                        image: item.image,
+                        price: item.price,
+                        product: item.id || item._id
+                    })),
+                    shippingAddress: {
                         street: formData.address,
                         city: formData.city,
-                        pincode: formData.zipCode
-                    }
-                }, {
+                        state: "N/A", // or add state to checkout form
+                        zip: formData.zipCode
+                    },
+                    itemsPrice: subtotal,
+                    shippingPrice: shipping,
+                    totalPrice: total
+                };
+
+                await axios.post('http://localhost:5000/api/order', orderData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
             } catch (error) {
-                console.error("Failed to update address", error);
+                console.error("Failed to place order", error);
             }
         }
 
-        setTimeout(() => {
-            setIsOrderPlaced(true);
-            clearCart();
-
-        }, 1500);
+        setIsOrderPlaced(true);
+        clearCart();
     };
 
     if (cartItems.length === 0 && !isOrderPlaced) {

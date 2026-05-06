@@ -14,6 +14,7 @@ import MainLayout from './layout/MainLayout'
 import { DataProvider } from './context/DataContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProductDetails from './pages/ProductDetails';
+import UserProfile from './pages/UserProfile';
 
 const ProtectedRoute = () => {
   const { user, isAuthLoading } = useAuth();
@@ -50,7 +51,7 @@ function App() {
 
               <Route element={<ProtectedRoute />}>
                 <Route path='checkout' element={<Checkout />} />
-                <Route path='profile' element={<div className="min-h-[60vh] flex items-center justify-center text-2xl font-bold">User Profile</div>} />
+                <Route path='profile' element={<UserProfile />} />
               </Route>
               <Route path="product/:id" element={<ProductDetails />} />
             </Route>

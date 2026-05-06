@@ -92,13 +92,43 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateProfile = async (profileData) => {
+        try {
+            const res = await axios.put('http://localhost:5000/api/user/profile', profileData, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                setUser(res.data.user);
+            }
+            return res.data;
+        } catch (error) {
+            console.error("Failed to update profile", error);
+            throw error;
+        }
+    };
+
+    const updateAddress = async (addressData) => {
+        try {
+            const res = await axios.put('http://localhost:5000/api/user/address', { address: addressData }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                setUser(res.data.user);
+            }
+            return res.data;
+        } catch (error) {
+            console.error("Failed to update address", error);
+            throw error;
+        }
+    };
+
     const logout = () => {
         setUser(null);
         setToken(null);
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, isAuthLoading, registerUser, login, logout }}>
+        <AuthContext.Provider value={{ user, token, isAuthLoading, registerUser, login, logout, updateProfile, updateAddress }}>
             {children}
         </AuthContext.Provider>
     );
