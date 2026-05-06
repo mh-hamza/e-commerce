@@ -23,7 +23,7 @@ const Sidebar = () => {
   return (
     <aside className="w-64 bg-white border-r border-gray-100 flex flex-col h-screen fixed left-0 top-0 z-50">
       <div className="p-6 flex items-center gap-3 border-b border-gray-50">
-        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">A</div>
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold">S </div>
         <span className="font-bold text-dark text-lg">FurniStore<span className="text-primary">.</span></span>
       </div>
 

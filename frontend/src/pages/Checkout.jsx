@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { Check } from 'lucide-react';
+import { Check, Truck, CreditCard, Lock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Checkout = () => {
@@ -11,6 +11,7 @@ const Checkout = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
     const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState('COD'); // COD selected by default
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -66,7 +67,8 @@ const Checkout = () => {
                     },
                     itemsPrice: subtotal,
                     shippingPrice: shipping,
-                    totalPrice: total
+                    totalPrice: total,
+                    paymentMethod: paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online',
                 };
 
                 await axios.post('http://localhost:5000/api/order', orderData, {
@@ -148,9 +150,56 @@ const Checkout = () => {
                             </div>
                         </div>
 
-                        <h2 className="text-xl font-bold mt-8 mb-4">Payment Method (Dummy)</h2>
-                        <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 text-sm">
-                            <p>For this demo, no payment details are required. Just click "Place Order".</p>
+                        {/* Payment Method */}
+                        <h2 className="text-xl font-bold mt-8 mb-4">Payment Method</h2>
+                        <div className="space-y-3">
+
+                            {/* Cash on Delivery */}
+                            <label
+                                htmlFor="cod"
+                                className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                                    paymentMethod === 'COD'
+                                        ? 'border-primary bg-primary/5'
+                                        : 'border-gray-200 hover:border-gray-300'
+                                }`}
+                            >
+                                <input
+                                    type="radio"
+                                    id="cod"
+                                    name="paymentMethod"
+                                    value="COD"
+                                    checked={paymentMethod === 'COD'}
+                                    onChange={() => setPaymentMethod('COD')}
+                                    className="accent-primary w-4 h-4"
+                                />
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                    <Truck size={20} className="text-primary" />
+                                </div>
+                                <div>
+                                    <p className="font-semibold text-dark text-sm">Cash on Delivery</p>
+                                    <p className="text-xs text-gray-500">Pay when your order arrives at your doorstep</p>
+                                </div>
+                            </label>
+
+                            {/* Online Payment — Disabled */}
+                            <div className="flex items-center gap-4 p-4 rounded-xl border-2 border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed relative">
+                                <input
+                                    type="radio"
+                                    disabled
+                                    className="w-4 h-4 accent-gray-400"
+                                />
+                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center shrink-0">
+                                    <CreditCard size={20} className="text-gray-400" />
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-gray-400 text-sm">Online Payment</p>
+                                    <p className="text-xs text-gray-400">Card / UPI / Net Banking</p>
+                                </div>
+                                <span className="text-xs font-bold bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                    <Lock size={10} /> Coming Soon
+                                </span>
+                            </div>
+
                         </div>
                     </form>
                 </div>

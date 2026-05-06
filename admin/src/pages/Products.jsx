@@ -38,9 +38,10 @@ const Products = () => {
         </div>
         <button
           onClick={() => navigate('/admin/products/add')}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30"
+          className="flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-all hover:opacity-90 shadow-lg"
+          style={{ background: 'linear-gradient(135deg, #8B5E3C, #6b4829)', boxShadow: '0 4px 14px rgba(139,94,60,0.35)' }}
         >
-          <Plus size={20} />
+          <Plus size={18} />
           <span>Add Product</span>
         </button>
       </div>
@@ -65,11 +66,12 @@ const Products = () => {
             onChange={(e) => setFilterCategory(e.target.value)}
           >
             <option value="">All Categories</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Furniture">Furniture</option>
-            <option value="Audio">Audio</option>
-            <option value="Shoes">Shoes</option>
-            <option value="Clothing">Clothing</option>
+            <option value="Sofa">Sofa</option>
+            <option value="Bed">Bed</option>
+            <option value="Chair">Chair</option>
+            <option value="Wardrobe">Wardrobe</option>
+            <option value="Office Furniture">Office Furniture</option>
+            <option value="Kids Furniture">Kids Furniture</option>
           </select>
         </div>
       </div>
@@ -84,7 +86,7 @@ const Products = () => {
                 <th className="px-6 py-4">Category</th>
                 <th className="px-6 py-4">Price</th>
                 <th className="px-6 py-4">Stock</th>
-                <th className="px-6 py-4">Status</th>
+
                 <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
@@ -119,27 +121,19 @@ const Products = () => {
                       <span className="text-sm text-gray-600">{product.stock}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                            ${product.status === 'Active'
-                        ? 'bg-green-50 text-green-700 border border-green-100'
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'}`}
-                    >
-                      {product.status}
-                    </span>
-                  </td>
+
                   <td className="px-6 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => handleEdit(product)}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-[#8B5E3C] hover:bg-[#8B5E3C]/10 rounded-lg transition-colors"
                         title="Edit"
                       >
                         <Edit2 size={16} />
                       </button>
                       <button
                         onClick={() => handleDelete(product.id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         title="Delete"
                       >
                         <Trash2 size={16} />
