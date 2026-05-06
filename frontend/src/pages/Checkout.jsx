@@ -1,26 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
+import axios from 'axios';
 import { Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Checkout = () => {
     const { cartItems, getCartTotal, clearCart } = useCart();
+    const { user, token } = useAuth();
     const navigate = useNavigate();
     const [isOrderPlaced, setIsOrderPlaced] = useState(false);
+
+    const [formData, setFormData] = useState({
+        firstName: '',
+        lastName: '',
+        email: '',
+        address: '',
+        city: '',
+        zipCode: ''
+    });
+
+    useEffect(() => {
+        if (user) {
+            const [firstName, ...lastNameParts] = (user.name || '').split(' ');
+            const lastName = lastNameParts.join(' ');
+            setFormData({
+                firstName: firstName || '',
+                lastName: lastName || '',
+                email: user.email || '',
+                address: user.address?.street || '',
+                city: user.address?.city || '',
+                zipCode: user.address?.pincode || ''
+            });
+        }
+    }, [user]);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     const subtotal = getCartTotal();
     const shipping = subtotal > 500 ? 0 : 50;
     const total = subtotal + shipping;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Simulate API call
+
+        if (user && token) {
+            try {
+                await axios.put('http://localhost:5000/api/user/address', {
+                    address: {
+                        street: formData.address,
+                        city: formData.city,
+                        pincode: formData.zipCode
+                    }
+                }, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+            } catch (error) {
+                console.error("Failed to update address", error);
+            }
+        }
+
         setTimeout(() => {
             setIsOrderPlaced(true);
             clearCart();
-            // setTimeout(() => navigate('/'), 3000); // Optional redirect
+
         }, 1500);
     };
 
@@ -62,32 +108,32 @@ const Checkout = () => {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-700">First Name</label>
-                                <input required type="text" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="John" />
+                                <input required type="text" name="firstName" value={formData.firstName} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="John" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-700">Last Name</label>
-                                <input required type="text" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="Doe" />
+                                <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="Doe" />
                             </div>
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-gray-700">Email Address</label>
-                            <input required type="email" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="john@example.com" />
+                            <input required type="email" name="email" value={formData.email} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="john@example.com" />
                         </div>
 
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-gray-700">Address</label>
-                            <input required type="text" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="123 Main St" />
+                            <input required type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="123 Main St" />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-700">City</label>
-                                <input required type="text" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="New York" />
+                                <input required type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="New York" />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-sm font-bold text-gray-700">Zip Code</label>
-                                <input required type="text" className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="10001" />
+                                <input required type="text" name="zipCode" value={formData.zipCode} onChange={handleChange} className="w-full border border-gray-300 px-4 py-3 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none" placeholder="10001" />
                             </div>
                         </div>
 

@@ -49,7 +49,12 @@ const loginUser = async (req, res) => {
       success: true,
       token,
       message: "Login successful",
-      userData: { name: existingUser.fullName, email: existingUser.email },
+      userData: { 
+        id: existingUser._id,
+        name: existingUser.fullName, 
+        email: existingUser.email, 
+        address: existingUser.address 
+      },
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Error logging in", error: error.message });
@@ -59,4 +64,40 @@ const loginUser = async (req, res) => {
 const verifyUser = async (req, res) => {
   return res.status(200).json({ success: true, message: "User verified successfully", user: req.user })
 }
-export { registerUser, loginUser, verifyUser };
+
+const updateAddress = async (req, res) => {
+  try {
+    const { address } = req.body;
+    const userId = req.user.id;
+    
+    if (!address) {
+      return res.status(400).json({ success: false, message: "Address is required" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { address },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Address updated successfully",
+      user: {
+        id: updatedUser._id,
+        name: updatedUser.fullName,
+        email: updatedUser.email,
+        address: updatedUser.address
+      }
+    });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error updating address", error: error.message });
+  }
+}
+
+export { registerUser, loginUser, verifyUser, updateAddress };

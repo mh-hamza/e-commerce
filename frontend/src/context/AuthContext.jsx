@@ -50,8 +50,7 @@ export const AuthProvider = ({ children }) => {
                     if (!res.data.success) {
                         logout();
                     } else if (res.data.user) {
-                        // Optionally update user data to ensure it's fresh
-                        // setUser(res.data.user);
+                        setUser(res.data.user);
                     }
                 } catch (error) {
                     console.error("Verification failed:", error);

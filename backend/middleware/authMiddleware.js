@@ -27,7 +27,7 @@ const authMiddleware = async (req, res, next) => {
       return res.status(404).json({ success: false, message: "User Not Found " })
     }
 
-    req.user = { email: user.email, name: user.fullName, id: user._id }
+    req.user = { email: user.email, name: user.fullName, id: user._id, address: user.address }
 
     next()
 
