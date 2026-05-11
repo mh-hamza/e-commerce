@@ -49,12 +49,12 @@ const loginUser = async (req, res) => {
       success: true,
       token,
       message: "Login successful",
-      userData: { 
+      userData: {
         id: existingUser._id,
-        name: existingUser.fullName, 
-        email: existingUser.email, 
+        name: existingUser.fullName,
+        email: existingUser.email,
         mobile: existingUser.phone,
-        address: existingUser.address 
+        address: existingUser.address
       },
     });
   } catch (error) {
@@ -99,7 +99,7 @@ const updateAddress = async (req, res) => {
   try {
     const { address } = req.body;
     const userId = req.user.id;
-    
+
     if (!address) {
       return res.status(400).json({ success: false, message: "Address is required" });
     }
@@ -131,4 +131,39 @@ const updateAddress = async (req, res) => {
   }
 }
 
-export { registerUser, loginUser, verifyUser, updateProfile, updateAddress };
+// On Logout cart and wishlssave on backend
+const syncCartWishlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { cart, wishlist } = req.body;
+
+    await User.findByIdAndUpdate(userId, {
+      cart: cart || [],
+      wishlist: wishlist || []
+    });
+
+    return res.status(200).json({ success: true, message: "Cart and wishlist saved successfully" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error saving cart/wishlist", error: error.message });
+  }
+};
+
+// Login ke baad cart aur wishlist fetch
+const getCartWishlist = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('cart wishlist');
+
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    return res.status(200).json({
+      success: true,
+      cart: user.cart || [],
+      wishlist: user.wishlist || []
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error fetching cart/wishlist", error: error.message });
+  }
+};
+
+export { registerUser, loginUser, verifyUser, updateProfile, updateAddress, syncCartWishlist, getCartWishlist };

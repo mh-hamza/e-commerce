@@ -4,21 +4,43 @@ const WishlistContext = createContext();
 
 export const useWishlist = () => useContext(WishlistContext);
 
-export const WishlistProvider = ({ children }) => {
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    try {
-      const savedWishlist = localStorage.getItem('saad_wishlist');
-      return savedWishlist ? JSON.parse(savedWishlist) : [];
-    } catch (error) {
-      console.error("Failed to parse wishlist from localStorage", error);
-      return [];
-    }
-  });
+const getWishlistFromStorage = () => {
+  try {
+    const savedWishlist = localStorage.getItem('saad_wishlist');
+    return savedWishlist ? JSON.parse(savedWishlist) : [];
+  } catch (error) {
+    console.error("Failed to parse wishlist from localStorage", error);
+    return [];
+  }
+};
 
+export const WishlistProvider = ({ children }) => {
+  const [wishlistItems, setWishlistItems] = useState(getWishlistFromStorage);
+
+  // Jab bhi wishlistItems badle, localStorage update karo
   useEffect(() => {
     localStorage.setItem('saad_wishlist', JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
+  // Login pe backend se data localStorage mein aa gaya — wishlist reload karo
+  useEffect(() => {
+    const handleLogin = () => {
+      setWishlistItems(getWishlistFromStorage());
+    };
+    // Logout pe wishlist clear karo
+    const handleLogout = () => {
+      setWishlistItems([]);
+    };
+
+    window.addEventListener('userLoggedIn', handleLogin);
+    window.addEventListener('userLoggedOut', handleLogout);
+    return () => {
+      window.removeEventListener('userLoggedIn', handleLogin);
+      window.removeEventListener('userLoggedOut', handleLogout);
+    };
+  }, []);
+
+  // Add to wishlist (localStorage mein)
   const addToWishlist = (product) => {
     setWishlistItems(prev => {
       const productId = product._id || product.id;
@@ -27,6 +49,7 @@ export const WishlistProvider = ({ children }) => {
     });
   };
 
+  // Remove from wishlist (localStorage mein)
   const removeFromWishlist = (id) => {
     setWishlistItems(prev => prev.filter(item => (item._id || item.id) !== id));
   };

@@ -53,6 +53,17 @@ const userSchema = new mongoose.Schema(
     },
     address: addressSchema,
 
+    // Cart and Wishlist 
+    cart: {
+      type: Array,
+      default: []
+    },
+
+    wishlist: {
+      type: Array,
+      default: []
+    },
+
     // Account status
     isVerified: {
       type: Boolean,
