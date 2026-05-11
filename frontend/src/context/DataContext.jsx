@@ -10,6 +10,7 @@ const DataContext = createContext();
 
 export const DataProvider = ({ children }) => {
     const [products, setProducts] = useState([]);
+    const [loadingProducts, setLoadingProducts] = useState(true);
     const [sofaCount, setSofaCount] = useState(0);
     const [bedCount, setBedCount] = useState(0);
     const [chairCount, setChairCount] = useState(0);
@@ -18,6 +19,7 @@ export const DataProvider = ({ children }) => {
     useEffect(() => {
         const fetchProducts = async () => {
             try {
+                setLoadingProducts(true);
                 const response = await axios.get('http://localhost:5000/api/product/getAllProducts');
                 if (response.data.success) {
                     setProducts(response.data.products);
@@ -26,6 +28,8 @@ export const DataProvider = ({ children }) => {
                 }
             } catch (error) {
                 console.error("Error fetching products:", error);
+            } finally {
+                setLoadingProducts(false);
             }
         };
         fetchProducts();
@@ -76,7 +80,7 @@ export const DataProvider = ({ children }) => {
     const filterCategories = ['All', 'Sofa', 'Bed', 'Chair', 'Table', 'Wardrobe', 'Office Furniture', 'Kids Furniture'];
 
     return (
-        <DataContext.Provider value={{ products, reviews, categories, features, filterCategories }}>
+        <DataContext.Provider value={{ products, loadingProducts, reviews, categories, features, filterCategories }}>
             {children}
         </DataContext.Provider>
     );

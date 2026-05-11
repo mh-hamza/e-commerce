@@ -10,7 +10,7 @@ import ProductCard from '../components/ProductCard';
 import { useToast } from '../context/ToastContext';
 
 const ProductDetails = () => {
-    const { products } = useData();
+    const { products, loadingProducts } = useData();
     const { id } = useParams();
     const product = products.find(p => p._id === id);
 
@@ -30,18 +30,52 @@ const ProductDetails = () => {
         }
     }, [id, product]);
 
+    const handleAddToCart = () => {
+        addToCart(product, quantity);
+        addToast(`Added ${quantity}x ${product.name} to cart`);
+    };
+
+    if (loadingProducts) {
+        return (
+            <div className="container mx-auto px-4 md:px-8 py-8 space-y-16">
+                <div className="h-4 bg-gray-200 animate-pulse rounded w-1/4 mb-8"></div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div className="space-y-4">
+                        <div className="bg-gray-200 animate-pulse rounded-2xl aspect-square md:h-[500px] w-full"></div>
+                        <div className="grid grid-cols-4 gap-4">
+                            {[1, 2, 3, 4].map((i) => (
+                                <div key={i} className="aspect-square bg-gray-200 animate-pulse rounded-xl"></div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="space-y-6">
+                        <div className="h-4 bg-gray-200 animate-pulse rounded w-1/4 mb-2"></div>
+                        <div className="h-10 bg-gray-200 animate-pulse rounded w-3/4 mb-2"></div>
+                        <div className="h-6 bg-gray-200 animate-pulse rounded w-1/3 mb-4"></div>
+                        <div className="h-10 bg-gray-200 animate-pulse rounded w-1/4 mb-6"></div>
+                        <div className="space-y-2">
+                            <div className="h-4 bg-gray-200 animate-pulse rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 animate-pulse rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 animate-pulse rounded w-5/6"></div>
+                        </div>
+                        <div className="h-px bg-gray-200 my-6"></div>
+                        <div className="flex gap-4">
+                            <div className="h-14 bg-gray-200 animate-pulse rounded-full w-full"></div>
+                            <div className="h-14 bg-gray-200 animate-pulse rounded-full w-24"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     if (!product) {
-        return <div className="text-center py-20">Product not found</div>;
+        return <div className="text-center py-20 text-xl text-gray-500">Product not found</div>;
     }
 
     const productId = product._id || product.id;
     const inWishlist = isInWishlist(productId);
     const relatedProducts = products.filter(p => p.category === product.category && (p._id || p.id) !== productId).slice(0, 4);
-
-    const handleAddToCart = () => {
-        addToCart(product, quantity);
-        addToast(`Added ${quantity}x ${product.name} to cart`);
-    };
 
     return (
         <div className="container mx-auto px-4 md:px-8 py-8 space-y-16">

@@ -6,8 +6,19 @@ import { useData } from '../context/DataContext';
 import ProductCard from '../components/ProductCard';
 
 const Home = () => {
-    const { products, features, categories } = useData();
+    const { products, loadingProducts, features, categories } = useData();
     const featuredProducts = products.filter(p => p.isBestSeller).slice(0, 4);
+
+    const renderSkeletons = () => (
+        [1, 2, 3, 4].map((n) => (
+            <div key={n} className="flex flex-col gap-4 w-full">
+                <div className="w-full h-64 bg-gray-200 animate-pulse rounded-2xl"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4"></div>
+                <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
+                <div className="h-8 bg-gray-200 animate-pulse rounded w-full mt-2"></div>
+            </div>
+        ))
+    );
 
     return (
         <div className="space-y-16 pb-16">
@@ -83,7 +94,7 @@ const Home = () => {
                     </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {featuredProducts.map((product) => (
+                    {loadingProducts ? renderSkeletons() : featuredProducts.map((product) => (
                         <ProductCard key={product._id} product={product} />
                     ))}
                 </div>
