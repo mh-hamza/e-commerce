@@ -20,7 +20,7 @@ export const DataProvider = ({ children }) => {
         const fetchProducts = async () => {
             try {
                 setLoadingProducts(true);
-                const response = await axios.get('http://localhost:5000/api/product/getAllProducts');
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/product/getAllProducts`);
                 if (response.data.success) {
                     setProducts(response.data.products);
                 } else {

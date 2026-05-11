@@ -30,7 +30,7 @@ const About = () => {
                 <div className="space-y-6">
                     <h2 className="text-3xl font-bold text-dark">Our Story</h2>
                     <p className="text-gray-600 leading-relaxed">
-                        Founded in 2024, SAAD FurniStore started with a simple mission: to make premium, modern furniture accessible to everyone. We started as a small team of designers and craftsmen, united by our passion for minimalism and functionality.
+                        Founded in 2018, SAAD FurniStore started with a simple mission: to make premium, modern furniture accessible to everyone. We started as a small team of designers and craftsmen, united by our passion for minimalism and functionality.
                     </p>
                     <p className="text-gray-600 leading-relaxed">
                         Today, we curate pieces that blend timeless design with modern comfort, ensuring that every piece you buy from us stands the test of time both in style and durability.

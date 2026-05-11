@@ -21,7 +21,7 @@ const ProductDetails = () => {
 
     const [selectedImage, setSelectedImage] = useState(product ? (product.images ? product.images[0] : product.image) : '');
 
-    // Scroll to top when id changes
+    // Scroll to top when id change
     useEffect(() => {
         window.scrollTo(0, 0);
         setQuantity(1);

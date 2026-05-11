@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import './App.css'
+
 import Home from './pages/Home'
 import About from './pages/About'
 import Contact from './pages/Contact'
@@ -15,6 +15,7 @@ import { DataProvider } from './context/DataContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProductDetails from './pages/ProductDetails';
 import UserProfile from './pages/UserProfile';
+import NotFound from './pages/NotFound';
 
 const ProtectedRoute = () => {
   const { user, isAuthLoading } = useAuth();
@@ -54,6 +55,7 @@ function App() {
                 <Route path='profile' element={<UserProfile />} />
               </Route>
               <Route path="product/:id" element={<ProductDetails />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </DataProvider>

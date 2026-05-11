@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
@@ -8,6 +8,21 @@ import ProductCard from '../components/ProductCard';
 const Home = () => {
     const { products, loadingProducts, features, categories } = useData();
     const featuredProducts = products.filter(p => p.isBestSeller).slice(0, 4);
+
+    const [showLoader, setShowLoader] = useState(true);
+
+    useEffect(() => {
+        if (!loadingProducts) {
+            setShowLoader(false);
+        }
+
+        // Fallback: If it doesn't load within 3 seconds, hide the loader anyway
+        const timer = setTimeout(() => {
+            setShowLoader(false);
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [loadingProducts]);
 
     const renderSkeletons = () => (
         [1, 2, 3, 4].map((n) => (
@@ -20,13 +35,25 @@ const Home = () => {
         ))
     );
 
+    if (showLoader) {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+                <div className="flex flex-col items-center">
+                    <div className="w-16 h-16 border-4 border-gray-200 border-t-primary rounded-full animate-spin mb-4"></div>
+                    <h2 className="text-xl font-bold text-dark tracking-widest uppercase">FurniStore<span className="text-primary">.</span></h2>
+                    <p className="text-sm text-gray-500 mt-2">Preparing your experience...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="space-y-16 pb-16">
+        <div className="space-y-16 pb-16 animate-in fade-in duration-1000">
             {/* Hero Section */}
             <section className="relative h-[80vh] bg-secondary/30 flex items-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <div className="absolute right-0 top-0 w-2/3 h-full bg-cover bg-center opacity-80" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&q=80&w=2927')" }}></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-secondary via-secondary/80 to-transparent"></div>
+                    <div className="absolute inset-0 bg-linear-to-r from-secondary via-secondary/80 to-transparent"></div>
                 </div>
 
                 <div className="container mx-auto px-4 md:px-8 relative z-10">
@@ -36,7 +63,7 @@ const Home = () => {
                         transition={{ duration: 0.8 }}
                         className="max-w-xl space-y-6"
                     >
-                        <span className="text-primary font-bold tracking-wider uppercase">New Collection 2024</span>
+                        <span className="text-primary font-bold tracking-wider uppercase">New Collection 2026</span>
                         <h1 className="text-5xl md:text-7xl font-bold text-dark leading-tight">
                             Comfort Meets <span className="text-primary">Style</span>
                         </h1>

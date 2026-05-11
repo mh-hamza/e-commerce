@@ -27,7 +27,7 @@ const Navbar = () => {
         { name: 'About', path: '/about' },
         { name: 'Contact', path: '/contact' },
     ];
-    console.log(user)
+    // console.log(user)
 
     return (
         <nav className="bg-white sticky top-0 z-50 shadow-sm border-b border-gray-100">

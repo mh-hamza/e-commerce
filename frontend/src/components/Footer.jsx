@@ -7,14 +7,14 @@ const Footer = () => {
         <footer className="bg-neutral pt-16 pb-8">
             <div className="container mx-auto px-4 md:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                    {/* Brand */}
+                    {/* Logo */}
                     <div className="space-y-4">
                         <Link to="/" className="text-2xl font-bold text-primary flex items-center gap-1">
                             <span className="font-black">SAAD</span>
                             <span className="font-light text-dark">FurniStore</span>
                         </Link>
                         <p className="text-gray-500 text-sm leading-relaxed">
-                            Crafting comfort for your home since 2024. Premium furniture designed for modern living.
+                            Crafting comfort for your home since 2018. Premium furniture designed for modern living.
                         </p>
                         <div className="flex gap-4">
                             <a href="#" className="text-dark hover:text-primary transition-colors"><Facebook size={20} /></a>
@@ -23,7 +23,7 @@ const Footer = () => {
                         </div>
                     </div>
 
-                    {/* Shop */}
+                    {/* Nav Links */}
                     <div>
                         <h3 className="font-bold text-dark mb-4">Shop</h3>
                         <ul className="space-y-2 text-sm text-gray-600">
@@ -65,8 +65,14 @@ const Footer = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-200 pt-8 text-center text-sm text-gray-500">
+                <div className="border-t border-gray-200 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500 gap-4">
                     <p>&copy; {new Date().getFullYear()} SAAD FurniStore. All rights reserved.</p>
+                    <p>
+                        Designed and developed by{' '}
+                        <a href="https://mohammadhamza.in" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
+                            Mohammad Hamza
+                        </a>
+                    </p>
                 </div>
             </div>
         </footer>

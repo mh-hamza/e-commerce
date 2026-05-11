@@ -48,10 +48,10 @@ const getAllOrdersAdmin = async (req, res) => {
 const updateOrderStatusAdmin = async (req, res) => {
   try {
     const { status } = req.body;
-    
-    // Use findById and save to correctly push to the array and trigger validation
+
+
     const order = await Order.findById(req.params.id);
-    
+
     if (!order) {
       return res.status(404).json({ success: false, message: "Order not found" });
     }

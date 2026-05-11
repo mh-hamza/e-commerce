@@ -20,7 +20,6 @@ const productSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      // Like: Sofa, Bed, Chair, Table
     },
     image: {
       type: String,

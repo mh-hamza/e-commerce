@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
-import { Check, Truck, CreditCard, Lock } from 'lucide-react';
+import { Check, Truck, CreditCard, Lock, Tag } from 'lucide-react';
+import { useToast } from '../context/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Checkout = () => {
@@ -11,7 +12,14 @@ const Checkout = () => {
     const { user, token } = useAuth();
     const navigate = useNavigate();
     const [isOrderPlaced, setIsOrderPlaced] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('COD'); // COD selected by default
+    const [paymentMethod, setPaymentMethod] = useState('COD');
+    const { addToast } = useToast();
+
+    // Coupon states
+    const [couponInput, setCouponInput] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [isValidatingCoupon, setIsValidatingCoupon] = useState(false);
 
     const [formData, setFormData] = useState({
         firstName: '',
@@ -26,7 +34,7 @@ const Checkout = () => {
         if (user) {
             const [firstName, ...lastNameParts] = (user.name || '').split(' ');
             const lastName = lastNameParts.join(' ');
-            
+
             setFormData({
                 firstName: firstName || '',
                 lastName: lastName || '',
@@ -43,8 +51,40 @@ const Checkout = () => {
     };
 
     const subtotal = getCartTotal();
-    const shipping = subtotal > 500 ? 0 : 50;
-    const total = subtotal + shipping;
+    const discountAmount = (subtotal * discountPercentage) / 100;
+    const subtotalAfterDiscount = subtotal - discountAmount;
+    const shipping = subtotalAfterDiscount > 500 ? 0 : 50;
+    const total = subtotalAfterDiscount + shipping;
+
+    const handleApplyCoupon = async () => {
+        if (!couponInput) return;
+        setIsValidatingCoupon(true);
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/coupon/validate`, { code: couponInput }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (res.data.success) {
+                setDiscountPercentage(res.data.discountPercentage);
+                setAppliedCoupon(couponInput);
+                addToast(res.data.message, 'success');
+            } else {
+                addToast(res.data.message, 'error');
+                setDiscountPercentage(0);
+                setAppliedCoupon(null);
+            }
+        } catch (error) {
+            addToast('Failed to validate coupon', 'error');
+        } finally {
+            setIsValidatingCoupon(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponInput('');
+        setDiscountPercentage(0);
+        addToast('Coupon removed', 'info');
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -62,16 +102,16 @@ const Checkout = () => {
                     shippingAddress: {
                         street: formData.address,
                         city: formData.city,
-                        state: "N/A", // or add state to checkout form
+                        state: "N/A",
                         zip: formData.zipCode
                     },
-                    itemsPrice: subtotal,
+                    itemsPrice: subtotalAfterDiscount,
                     shippingPrice: shipping,
                     totalPrice: total,
                     paymentMethod: paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online',
                 };
 
-                await axios.post('http://localhost:5000/api/order', orderData, {
+                await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/order`, orderData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
             } catch (error) {
@@ -157,11 +197,10 @@ const Checkout = () => {
                             {/* Cash on Delivery */}
                             <label
                                 htmlFor="cod"
-                                className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                                    paymentMethod === 'COD'
+                                className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'COD'
                                         ? 'border-primary bg-primary/5'
                                         : 'border-gray-200 hover:border-gray-300'
-                                }`}
+                                    }`}
                             >
                                 <input
                                     type="radio"
@@ -225,18 +264,63 @@ const Checkout = () => {
                             ))}
                         </div>
 
+                        <div className="border-t border-gray-200 pt-4 pb-4">
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                                    <input 
+                                        type="text" 
+                                        placeholder="Promo code" 
+                                        value={couponInput}
+                                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                                        disabled={!!appliedCoupon}
+                                        className="w-full pl-9 pr-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary focus:border-transparent outline-none disabled:bg-gray-100 disabled:text-gray-500 uppercase text-sm"
+                                    />
+                                </div>
+                                {appliedCoupon ? (
+                                    <button 
+                                        type="button"
+                                        onClick={handleRemoveCoupon}
+                                        className="px-4 py-3 bg-red-50 text-red-600 rounded-lg font-bold text-sm hover:bg-red-100 transition-colors"
+                                    >
+                                        Remove
+                                    </button>
+                                ) : (
+                                    <button 
+                                        type="button"
+                                        onClick={handleApplyCoupon}
+                                        disabled={isValidatingCoupon || !couponInput}
+                                        className="px-4 py-3 bg-gray-900 text-white rounded-lg font-bold text-sm hover:bg-gray-800 transition-colors disabled:opacity-50"
+                                    >
+                                        {isValidatingCoupon ? '...' : 'Apply'}
+                                    </button>
+                                )}
+                            </div>
+                            {appliedCoupon && (
+                                <p className="text-green-600 text-sm mt-2 font-medium flex items-center gap-1">
+                                    <Check size={14} /> Coupon {appliedCoupon} applied ({discountPercentage}% off)
+                                </p>
+                            )}
+                        </div>
+
                         <div className="border-t border-gray-200 pt-4 space-y-2">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>${subtotal}</span>
+                                <span>${subtotal.toFixed(2)}</span>
                             </div>
+                            {discountAmount > 0 && (
+                                <div className="flex justify-between text-green-600">
+                                    <span>Discount ({discountPercentage}%)</span>
+                                    <span>-${discountAmount.toFixed(2)}</span>
+                                </div>
+                            )}
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
-                                <span>{shipping === 0 ? 'Free' : `$${shipping}`}</span>
+                                <span>{shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`}</span>
                             </div>
                             <div className="flex justify-between font-bold text-xl text-dark pt-2">
                                 <span>Total</span>
-                                <span>${total}</span>
+                                <span>${total.toFixed(2)}</span>
                             </div>
                         </div>
 

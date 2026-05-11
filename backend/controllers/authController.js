@@ -131,7 +131,7 @@ const updateAddress = async (req, res) => {
   }
 }
 
-// On Logout cart and wishlssave on backend
+// On Logout cart and wishl save on backend
 const syncCartWishlist = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -148,7 +148,6 @@ const syncCartWishlist = async (req, res) => {
   }
 };
 
-// Login ke baad cart aur wishlist fetch
 const getCartWishlist = async (req, res) => {
   try {
     const userId = req.user.id;

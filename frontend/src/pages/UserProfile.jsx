@@ -32,7 +32,7 @@ const Profile = () => {
     useEffect(() => {
         if (user && token) {
             setLoadingOrders(true);
-            axios.get('http://localhost:5000/api/order/user', {
+            axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/order/user`, {
                 headers: { Authorization: `Bearer ${token}` }
             })
                 .then(res => setOrders(res.data.orders))

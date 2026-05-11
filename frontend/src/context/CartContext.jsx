@@ -17,17 +17,17 @@ const getCartFromStorage = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState(getCartFromStorage);
 
-  // Jab bhi cartItems badle, localStorage update karo
+  // on cartItems change update localS
   useEffect(() => {
     localStorage.setItem('saad_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Login pe backend se data localStorage mein aa gaya — cart reload karo
+  //  fetch data from database
   useEffect(() => {
     const handleLogin = () => {
       setCartItems(getCartFromStorage());
     };
-    // Logout pe cart clear karo (localStorage already clear ho chuka hoga AuthContext mein)
+
     const handleLogout = () => {
       setCartItems([]);
     };
@@ -40,7 +40,7 @@ export const CartProvider = ({ children }) => {
     };
   }, []);
 
-  // Add to cart (localStorage mein)
+  // Add to cart localStorage 
   const addToCart = (product, quantity = 1) => {
     setCartItems(prev => {
       const productId = product._id || product.id;
@@ -56,12 +56,12 @@ export const CartProvider = ({ children }) => {
     });
   };
 
-  // Remove from cart (localStorage mein)
+  // Remove from cart localStorage 
   const removeFromCart = (id) => {
     setCartItems(prev => prev.filter(item => (item._id || item.id) !== id));
   };
 
-  // Update quantity (localStorage mein)
+  // Update quantity 
   const updateQuantity = (id, quantity) => {
     if (quantity < 1) return;
     setCartItems(prev =>
@@ -69,10 +69,10 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  // Clear cart (localStorage mein)
+
   const clearCart = () => setCartItems([]);
 
-  // Cart total
+
   const getCartTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
   };

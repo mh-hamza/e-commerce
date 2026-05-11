@@ -7,6 +7,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import userAuthRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import couponRoutes from "./routes/couponRoutes.js";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/user", userAuthRoutes);
 app.use("/api/product", productRoutes);
 app.use("/api/order", orderRoutes);
+app.use("/api/coupon", couponRoutes);
 
 app.get("/", (req, res) => {
   res.send("API is running...");

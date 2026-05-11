@@ -5,7 +5,7 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-const API = 'http://localhost:5000/api/user';
+const API = `${import.meta.env.VITE_BACKEND_URL}/api/user`;
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(() => {
@@ -44,7 +44,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, [token]);
 
-    // token verify 
+    // token  verify 
     useEffect(() => {
         const verifyUser = async () => {
             if (token) {
@@ -74,11 +74,11 @@ export const AuthProvider = ({ children }) => {
                 headers: { Authorization: `Bearer ${userToken}` }
             });
             if (res.data.success) {
-                // Cart: if data in backend use it
+                // Cart 
                 if (res.data.cart && res.data.cart.length > 0) {
                     localStorage.setItem('saad_cart', JSON.stringify(res.data.cart));
                 }
-                // Wishlist: if data in backend use it
+                // Wishlist
                 if (res.data.wishlist && res.data.wishlist.length > 0) {
                     localStorage.setItem('saad_wishlist', JSON.stringify(res.data.wishlist));
                 }
@@ -88,7 +88,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Logout se pehle localStorage ka cart+wishlist backend pe save karo
+    // On logout send cart data to backend
     const saveCartWishlistToBackend = async (userToken) => {
         try {
             const cart = JSON.parse(localStorage.getItem('saad_cart') || '[]');
@@ -125,10 +125,10 @@ export const AuthProvider = ({ children }) => {
                 setUser(response.data.userData);
                 setToken(userToken);
 
-                // Login ke baad backend se cart+wishlist wapas localStorage mein lao
+                // fetch wishlisht cart from backend
                 await loadCartWishlistFromBackend(userToken);
 
-                // CartContext aur WishlistContext ko reload karne ke liye event fire karo
+                // notify contexts to reload
                 window.dispatchEvent(new Event('userLoggedIn'));
             }
             return response.data;
@@ -138,20 +138,18 @@ export const AuthProvider = ({ children }) => {
     };
 
     const logout = async () => {
-        // Pehle localStorage ka data backend pe save karo
         if (token) {
             await saveCartWishlistToBackend(token);
         }
 
-        // Ab user aur token clear karo
+
         setUser(null);
         setToken(null);
 
-        // localStorage se cart aur wishlist clear karo
+
         localStorage.removeItem('saad_cart');
         localStorage.removeItem('saad_wishlist');
 
-        // Contexts ko notify karo
         window.dispatchEvent(new Event('userLoggedOut'));
     };
 

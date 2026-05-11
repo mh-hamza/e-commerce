@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Star, Eye } from "lucide-react";
 import { motion } from "framer-motion";
@@ -10,6 +10,7 @@ const ProductCard = ({ product }) => {
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
     const productId = product._id || product.id;
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     return (
         <motion.div
@@ -51,19 +52,27 @@ const ProductCard = ({ product }) => {
                 <Heart size={16} fill={isInWishlist(productId) ? "currentColor" : "none"} />
             </button>
 
-            {/* Product Image (Main Link) */}
+            {/* Product Image  */}
             <Link
                 to={`/product/${productId}`}
                 className="block relative aspect-[4/5] overflow-hidden bg-gray-100"
             >
+                {/* Image Skeleton */}
+                {!imageLoaded && (
+                    <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
+                )}
+                
                 <img
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    loading="lazy"
+                    decoding="async"
+                    onLoad={() => setImageLoaded(true)}
+                    className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'}`}
                 />
 
-                {/* Hover Actions */}
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3">
+                {/* Hover  */}
+                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3 z-20">
 
                     {/* Add to cart button */}
                     <button
@@ -77,7 +86,7 @@ const ProductCard = ({ product }) => {
                         <ShoppingCart size={20} />
                     </button>
 
-                    {/* View Details button (fixed) */}
+                    {/* View Details button */}
                     <button
                         onClick={(e) => { e.preventDefault(); navigate(`/product/${productId}`); }}
                         className="bg-white p-2 rounded-full translate-y-4 group-hover:translate-y-0 transition duration-300 delay-75 hover:bg-primary hover:text-white"
@@ -115,4 +124,4 @@ const ProductCard = ({ product }) => {
     );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

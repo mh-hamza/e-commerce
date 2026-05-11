@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 
-// GET all users with pagination & search (Admin only)
+// GET all users 
 const getAllUsersAdmin = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -10,12 +10,12 @@ const getAllUsersAdmin = async (req, res) => {
 
     const searchQuery = search
       ? {
-          $or: [
-            { fullName: { $regex: search, $options: "i" } },
-            { email: { $regex: search, $options: "i" } },
-            { phone: { $regex: search, $options: "i" } },
-          ],
-        }
+        $or: [
+          { fullName: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
+          { phone: { $regex: search, $options: "i" } },
+        ],
+      }
       : {};
 
     const total = await User.countDocuments(searchQuery);
@@ -37,7 +37,7 @@ const getAllUsersAdmin = async (req, res) => {
   }
 };
 
-// PUT block/unblock a user (Admin only)
+// Block/unblock a user
 const toggleBlockUserAdmin = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);

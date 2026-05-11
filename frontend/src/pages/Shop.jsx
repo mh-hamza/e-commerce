@@ -8,7 +8,7 @@ import ProductCard from '../components/ProductCard';
 const Shop = () => {
     const { products, filterCategories: categories } = useData();
     const [searchParams, setSearchParams] = useSearchParams();
-    const categoryParam = searchParams.get('category'); // Get category  from URL
+    const categoryParam = searchParams.get('category');
 
     const [filteredProducts, setFilteredProducts] = useState(products);
     const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'All');
@@ -25,7 +25,7 @@ const Shop = () => {
         }
     }, [categoryParam]);
 
-    // Filter Logic
+    // Filter 
     useEffect(() => {
         let result = products;
 
@@ -37,7 +37,7 @@ const Shop = () => {
         // Filter by Price
         result = result.filter(p => p.price <= priceRange);
 
-        // Sort
+        // Sorting
         if (sortBy === 'price-low') {
             result.sort((a, b) => a.price - b.price);
         } else if (sortBy === 'price-high') {

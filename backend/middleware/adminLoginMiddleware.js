@@ -5,7 +5,7 @@ const ADMIN_EMAIL = "admin@saadstore.com";
 
 
 const ADMIN_PASSWORD_HASH = "$2b$10$ehdaIBvkDjYwRgDc/YwhseDvH5I1RuNBGEojHK.TB4POqE00As8Wu";
-//admin123
+
 
 const adminLoginMiddleware = async (req, res, next) => {
   const { email, password } = req.body;

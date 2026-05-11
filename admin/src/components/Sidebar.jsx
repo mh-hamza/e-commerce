@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, FileText, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, LogOut, Ticket, CreditCard } from 'lucide-react';
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ const Sidebar = () => {
     { icon: ShoppingCart, label: 'Orders', path: '/admin/orders' },
     { icon: Users, label: 'Users', path: '/admin/users' },
     { icon: CreditCard, label: 'Payments', path: '/admin/payments' },
-    { icon: FileText, label: 'Content', path: '/admin/content' },
+    { icon: Ticket, label: 'Coupons', path: '/admin/coupons' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
   ];
 

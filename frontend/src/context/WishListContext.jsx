@@ -17,17 +17,17 @@ const getWishlistFromStorage = () => {
 export const WishlistProvider = ({ children }) => {
   const [wishlistItems, setWishlistItems] = useState(getWishlistFromStorage);
 
-  // Jab bhi wishlistItems badle, localStorage update karo
+  // Update wishlisht local storage
   useEffect(() => {
     localStorage.setItem('saad_wishlist', JSON.stringify(wishlistItems));
   }, [wishlistItems]);
 
-  // Login pe backend se data localStorage mein aa gaya — wishlist reload karo
+  // fetch data from database
   useEffect(() => {
     const handleLogin = () => {
       setWishlistItems(getWishlistFromStorage());
     };
-    // Logout pe wishlist clear karo
+
     const handleLogout = () => {
       setWishlistItems([]);
     };
@@ -40,7 +40,7 @@ export const WishlistProvider = ({ children }) => {
     };
   }, []);
 
-  // Add to wishlist (localStorage mein)
+  // Add to wishlist localStorage
   const addToWishlist = (product) => {
     setWishlistItems(prev => {
       const productId = product._id || product.id;
@@ -49,7 +49,7 @@ export const WishlistProvider = ({ children }) => {
     });
   };
 
-  // Remove from wishlist (localStorage mein)
+  // Remove from wishlist
   const removeFromWishlist = (id) => {
     setWishlistItems(prev => prev.filter(item => (item._id || item.id) !== id));
   };
