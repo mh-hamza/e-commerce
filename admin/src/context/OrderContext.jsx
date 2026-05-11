@@ -30,12 +30,17 @@ export const OrderProvider = ({ children }) => {
 
   useEffect(() => {
     fetchOrders();
+
+    // Login to fetch data 
+    const handleAdminLogin = () => fetchOrders();
+    window.addEventListener('adminLoggedIn', handleAdminLogin);
+    return () => window.removeEventListener('adminLoggedIn', handleAdminLogin);
   }, []);
 
   const updateOrderStatus = async (id, newStatus) => {
     try {
       const adminToken = localStorage.getItem('adminToken');
-      const res = await axios.put(`${import.meta.env.VITE_BACKEND_API_URL}/api/order/admin/${id}/status`, 
+      const res = await axios.put(`${import.meta.env.VITE_BACKEND_API_URL}/api/order/admin/${id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${adminToken}` } }
       );

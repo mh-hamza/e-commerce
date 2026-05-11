@@ -17,6 +17,8 @@ const Login = () => {
       console.log(response);
       if (response.data.success) {
         localStorage.setItem("adminToken", response.data.token);
+        // All contexts notify to admin logim
+        window.dispatchEvent(new Event('adminLoggedIn'));
         alert("Login Successful");
         navigate("/");
       }

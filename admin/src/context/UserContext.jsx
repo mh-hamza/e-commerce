@@ -50,6 +50,13 @@ export const UserProvider = ({ children }) => {
     return () => clearTimeout(timer);
   }, [searchTerm, fetchUsers]);
 
+  useEffect(() => {
+    // Login to fetch data
+    const handleAdminLogin = () => fetchUsers(1, searchTerm);
+    window.addEventListener('adminLoggedIn', handleAdminLogin);
+    return () => window.removeEventListener('adminLoggedIn', handleAdminLogin);
+  }, [fetchUsers, searchTerm]);
+
   const goToPage = (page) => {
     fetchUsers(page, searchTerm);
   };
