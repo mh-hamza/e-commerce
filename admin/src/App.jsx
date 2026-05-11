@@ -4,7 +4,7 @@ import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Users from './pages/Users';
-import Payments from './pages/Payments.JSX';
+import Payments from './pages/Payments';
 import Coupons from './pages/Coupons';
 import Settings from './pages/Settings';
 import { AdminProvider } from './context/AdminContext';
