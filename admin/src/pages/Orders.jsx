@@ -225,8 +225,8 @@ const Orders = () => {
                 <h3 className="font-semibold text-gray-800 flex items-center gap-2 mb-4">
                   <Package className="text-blue-500" size={18} /> Ordered Items
                 </h3>
-                <div className="border border-gray-100 rounded-xl overflow-hidden">
-                  <table className="w-full text-left text-sm">
+                <div className="border border-gray-100 rounded-xl overflow-x-auto">
+                  <table className="w-full text-left text-sm min-w-[500px]">
                     <thead className="bg-gray-50">
                       <tr>
                         <th className="px-4 py-3 font-medium text-gray-600">Product</th>

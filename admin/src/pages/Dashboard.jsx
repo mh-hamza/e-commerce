@@ -100,7 +100,7 @@ const Dashboard = () => {
       </div>
 
       {/* Order Status Breakdown */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Processing', count: stats.pendingOrders,   icon: Clock,         bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-100' },
           { label: 'Shipped',    count: stats.shippedOrders,   icon: Truck,         bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-100' },

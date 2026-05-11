@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, MoreVertical } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, MoreVertical, ChevronDown } from 'lucide-react';
 import { useProducts } from '../context/ProductContext';
 import ProductForm from '../components/ProductForm';
 import { Link, useNavigate } from 'react-router-dom';
@@ -47,13 +47,13 @@ const Products = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="relative col-span-1 sm:col-span-2">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="relative md:col-span-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <input
             type="text"
             placeholder="Search products..."
-            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -61,7 +61,7 @@ const Products = () => {
         <div className="relative">
           <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
           <select
-            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none cursor-pointer transition-all"
+            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B5E3C]/20 focus:border-[#8B5E3C] appearance-none cursor-pointer transition-all"
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
           >
@@ -73,6 +73,9 @@ const Products = () => {
             <option value="Office Furniture">Office Furniture</option>
             <option value="Kids Furniture">Kids Furniture</option>
           </select>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+            <ChevronDown size={18} />
+          </div>
         </div>
       </div>
 

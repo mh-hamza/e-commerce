@@ -147,8 +147,8 @@ const ProductForm = ({ initialData, onSubmit }) => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <form onSubmit={handleSubmit} className="p-8 bg-white/50 backdrop-blur-xl rounded-2xl border border-gray-100 w-full max-w-5xl mx-auto space-y-8 text-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-12">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-8 bg-white/50 backdrop-blur-xl rounded-2xl border border-gray-100 w-full max-w-5xl mx-auto space-y-6 sm:space-y-8 text-gray-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100 pb-5 gap-4">
           <div>
             <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
@@ -181,7 +181,7 @@ const ProductForm = ({ initialData, onSubmit }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
           {/* Left Column */}
           <div className="space-y-6">
             <div className="space-y-1.5">
