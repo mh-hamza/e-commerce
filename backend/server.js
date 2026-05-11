@@ -17,7 +17,16 @@ connectDB();
 const app = express();
 
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "https://saad-ecom-admin.netlify.app",
+      "http://localhost:5173",
+      "http://localhost:5174"
+    ],
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 
