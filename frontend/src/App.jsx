@@ -16,6 +16,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProductDetails from './pages/ProductDetails';
 import UserProfile from './pages/UserProfile';
 import NotFound from './pages/NotFound';
+import ScrollToTop from './components/ScrollToTop';
 
 const ProtectedRoute = () => {
   const { user, isAuthLoading } = useAuth();
@@ -36,6 +37,7 @@ function App() {
     <>
       <AuthProvider>
         <DataProvider>
+          <ScrollToTop />
           <Routes>
             <Route path='/' element={<MainLayout />}>
               <Route index element={<Home />} />
