@@ -5,10 +5,19 @@ import { Eye, CheckCircle, Smartphone, Truck, XCircle, Search, Filter, X, Clock,
 const ORDERS_PER_PAGE = 20;
 
 const Orders = () => {
-  const { orders, loadingOrders, updateOrderStatus } = useOrders();
-  const [searchTerm, setSearchTerm] = useState('');
+  const {
+    orders,
+    loadingOrders,
+    updateOrderStatus,
+    totalOrders,
+    totalPages,
+    currentPage,
+    searchTerm,
+    setSearchTerm,
+    goToPage
+  } = useOrders();
+
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -21,20 +30,8 @@ const Orders = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => 
-    order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.user?.fullName || '').toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
-  const paginatedOrders = filteredOrders.slice(
-    (currentPage - 1) * ORDERS_PER_PAGE,
-    currentPage * ORDERS_PER_PAGE
-  );
-
   const handleSearch = (val) => {
     setSearchTerm(val);
-    setCurrentPage(1); // reset to page 1 on search
   };
 
   return (
@@ -43,7 +40,7 @@ const Orders = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Orders</h1>
           <p className="text-gray-500 text-sm mt-1">
-            {loadingOrders ? 'Loading...' : `${filteredOrders.length} orders found`}
+            {loadingOrders ? 'Loading...' : `${totalOrders} orders found`}
           </p>
         </div>
       </div>
@@ -63,7 +60,10 @@ const Orders = () => {
         </div>
 
         {loadingOrders ? (
-          <div className="p-8 text-center text-gray-500">Loading orders...</div>
+          <div className="p-12 text-center">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-500">Loading orders...</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -79,7 +79,7 @@ const Orders = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {paginatedOrders.map((order) => (
+                {orders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-gray-800">#{order._id.substring(order._id.length - 6).toUpperCase()}</td>
                     <td className="px-6 py-4 text-gray-600">{order.user?.fullName || 'Unknown'}</td>
@@ -112,7 +112,7 @@ const Orders = () => {
                     </td>
                   </tr>
                 ))}
-                {paginatedOrders.length === 0 && (
+                {orders.length === 0 && (
                   <tr>
                     <td colSpan="7" className="px-6 py-8 text-center text-gray-500">No orders found.</td>
                   </tr>
@@ -131,7 +131,7 @@ const Orders = () => {
             </p>
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
@@ -150,7 +150,7 @@ const Orders = () => {
                   ) : (
                     <button
                       key={item}
-                      onClick={() => setCurrentPage(item)}
+                      onClick={() => goToPage(item)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
                         item === currentPage
                           ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
@@ -162,7 +162,7 @@ const Orders = () => {
                   )
                 )}
               <button
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >

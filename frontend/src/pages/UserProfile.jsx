@@ -27,18 +27,29 @@ const Profile = () => {
     const [orders, setOrders] = useState([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
     const [trackingOrder, setTrackingOrder] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const { token } = useAuth();
 
-    useEffect(() => {
+    const fetchOrders = (page = 1) => {
         if (user && token) {
             setLoadingOrders(true);
             axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/order/user`, {
+                params: { page, limit: 5 },
                 headers: { Authorization: `Bearer ${token}` }
             })
-                .then(res => setOrders(res.data.orders))
+                .then(res => {
+                    setOrders(res.data.orders);
+                    setTotalPages(res.data.totalPages);
+                    setCurrentPage(res.data.currentPage);
+                })
                 .catch(err => console.error("Error fetching orders", err))
                 .finally(() => setLoadingOrders(false));
         }
+    };
+
+    useEffect(() => {
+        fetchOrders(1);
     }, [user, token]);
 
     if (!user) {
@@ -324,6 +335,27 @@ const Profile = () => {
                             <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                             <p className="text-gray-500">No orders found.</p>
                             <a href="/shop" className="text-primary font-medium mt-2 hover:underline inline-block">Start Shopping</a>
+                        </div>
+                    )}
+
+                    {/* Pagination for User Orders */}
+                    {!loadingOrders && totalPages > 1 && (
+                        <div className="flex justify-center items-center gap-4 mt-8">
+                            <button
+                                onClick={() => fetchOrders(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-4 py-2 border border-primary text-primary rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary hover:text-white transition-colors"
+                            >
+                                Previous
+                            </button>
+                            <span className="text-gray-600 font-medium">Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={() => fetchOrders(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="px-4 py-2 border border-primary text-primary rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-primary hover:text-white transition-colors"
+                            >
+                                Next
+                            </button>
                         </div>
                     )}
                 </div>

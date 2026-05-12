@@ -1,9 +1,16 @@
 import React, { useMemo } from 'react';
 import { useOrders } from '../context/OrderContext';
-import { Truck, CreditCard, Lock, CheckCircle, Clock, XCircle, TrendingUp, IndianRupee } from 'lucide-react';
+import { Truck, CreditCard, Lock, CheckCircle, Clock, XCircle, TrendingUp, IndianRupee, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const Payments = () => {
-  const { orders, loadingOrders } = useOrders();
+  const {
+    orders,
+    loadingOrders,
+    totalOrders,
+    totalPages,
+    currentPage,
+    goToPage
+  } = useOrders();
 
   const stats = useMemo(() => {
     const cod = orders.filter(o => !o.paymentMethod || o.paymentMethod === 'Cash on Delivery');
@@ -51,7 +58,7 @@ const Payments = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+      <div className="grid  gap-5">
         {[
           {
             label: 'Total COD Orders',
@@ -93,71 +100,131 @@ const Payments = () => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Recent COD Transactions */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h2 className="font-bold text-gray-800">Recent COD Transactions</h2>
-          <p className="text-xs text-gray-400 mt-0.5">Orders sorted by newest first</p>
-        </div>
-
-        {loadingOrders ? (
-          <div className="p-8 text-center text-gray-400">Loading transactions...</div>
-        ) : orders.length === 0 ? (
-          <div className="p-8 text-center text-gray-400">No orders yet.</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50/80 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold tracking-wider">
-                <tr>
-                  <th className="px-6 py-3">Order ID</th>
-                  <th className="px-6 py-3">Customer</th>
-                  <th className="px-6 py-3">Date</th>
-                  <th className="px-6 py-3">Amount</th>
-                  <th className="px-6 py-3">Order Status</th>
-                  <th className="px-6 py-3">Payment Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-50">
-                {orders.slice(0, 15).map(order => (
-                  <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
-                    <td className="px-6 py-3.5 font-mono font-semibold text-gray-700">
-                      #{order._id.substring(order._id.length - 8).toUpperCase()}
-                    </td>
-                    <td className="px-6 py-3.5 text-gray-600">{order.user?.fullName || 'Unknown'}</td>
-                    <td className="px-6 py-3.5 text-gray-500">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
-                    <td className="px-6 py-3.5 font-bold text-gray-800">₹{order.totalPrice?.toLocaleString('en-IN')}</td>
-                    <td className="px-6 py-3.5">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
-                        order.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
-                        'bg-blue-100 text-blue-700'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3.5">
-                      {order.status === 'Delivered' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                          <CheckCircle size={11} /> Collected
-                        </span>
-                      ) : order.status === 'Cancelled' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                          <XCircle size={11} /> Not Collected
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                          <Clock size={11} /> Pending
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {/* Recent COD Transactions */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <div>
+              <h2 className="font-bold text-gray-800">Recent COD Transactions</h2>
+              <p className="text-xs text-gray-400 mt-0.5">Orders sorted by newest first</p>
+            </div>
+            <p className="text-sm text-gray-500">
+              Total {totalOrders} transactions
+            </p>
           </div>
-        )}
+
+          {loadingOrders ? (
+            <div className="p-12 text-center">
+              <div className="w-10 h-10 border-4 border-[#8B5E3C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500">Loading transactions...</p>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="p-8 text-center text-gray-400">No orders yet.</div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-gray-50/80 border-b border-gray-100 text-xs uppercase text-gray-500 font-semibold tracking-wider">
+                    <tr>
+                      <th className="px-6 py-3">Order ID</th>
+                      <th className="px-6 py-3">Customer</th>
+                      <th className="px-6 py-3">Date</th>
+                      <th className="px-6 py-3">Amount</th>
+                      <th className="px-6 py-3">Order Status</th>
+                      <th className="px-6 py-3">Payment Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {orders.map(order => (
+                      <tr key={order._id} className="hover:bg-gray-50/50 transition-colors">
+                        <td className="px-6 py-3.5 font-mono font-semibold text-gray-700">
+                          #{order._id.substring(order._id.length - 8).toUpperCase()}
+                        </td>
+                        <td className="px-6 py-3.5 text-gray-600">{order.user?.fullName || 'Unknown'}</td>
+                        <td className="px-6 py-3.5 text-gray-500">{new Date(order.createdAt).toLocaleDateString('en-IN')}</td>
+                        <td className="px-6 py-3.5 font-bold text-gray-800">₹{order.totalPrice?.toLocaleString('en-IN')}</td>
+                        <td className="px-6 py-3.5">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${order.status === 'Delivered' ? 'bg-green-100 text-green-700' :
+                            order.status === 'Cancelled' ? 'bg-red-100 text-red-700' :
+                              'bg-blue-100 text-blue-700'
+                            }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-3.5">
+                          {order.status === 'Delivered' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                              <CheckCircle size={11} /> Collected
+                            </span>
+                          ) : order.status === 'Cancelled' ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
+                              <XCircle size={11} /> Not Collected
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                              <Clock size={11} /> Pending
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination Footer */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/40">
+                  <p className="text-sm text-gray-500">
+                    Page <span className="font-medium text-gray-700">{currentPage}</span> of{' '}
+                    <span className="font-medium text-gray-700">{totalPages}</span>
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => goToPage(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+
+                    {/* Page Number Buttons */}
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 1)
+                      .reduce((acc, p, idx, arr) => {
+                        if (idx > 0 && p - arr[idx - 1] > 1) acc.push('...');
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((item, idx) =>
+                        item === '...' ? (
+                          <span key={`ellipsis-${idx}`} className="px-2 text-gray-400 text-sm">...</span>
+                        ) : (
+                          <button
+                            key={item}
+                            onClick={() => goToPage(item)}
+                            className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${item === currentPage
+                              ? 'bg-[#8B5E3C] text-white shadow-sm'
+                              : 'border border-gray-200 text-gray-600 hover:bg-white'
+                              }`}
+                          >
+                            {item}
+                          </button>
+                        )
+                      )}
+
+                    <button
+                      onClick={() => goToPage(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="p-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Online Payment Coming Soon */}
@@ -178,4 +245,4 @@ const Payments = () => {
   );
 };
 
-export default Payments;
+export default Payments;
