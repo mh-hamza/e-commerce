@@ -62,14 +62,20 @@ const ProductCard = ({ product }) => {
                     <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
                 )}
                 
-                <img
-                    src={product.image}
-                    alt={product.name}
-                    loading="lazy"
-                    decoding="async"
-                    onLoad={() => setImageLoaded(true)}
-                    className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'}`}
-                />
+                {product.image ? (
+                    <img
+                        src={product.image}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={() => setImageLoaded(true)}
+                        className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'}`}
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                        No Image
+                    </div>
+                )}
 
                 {/* Hover  */}
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition flex items-center justify-center gap-3 z-20">

@@ -40,7 +40,13 @@ const Cart = () => {
                                 className="flex gap-4 md:gap-6 p-4 md:p-6 bg-white border border-gray-100 rounded-xl shadow-sm"
                             >
                                 <div className="w-24 h-24 md:w-32 md:h-32 bg-gray-100 rounded-lg overflow-hidden shrink-0">
-                                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                    {item.image ? (
+                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-200">
+                                            No Image
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex-1 flex flex-col justify-between">

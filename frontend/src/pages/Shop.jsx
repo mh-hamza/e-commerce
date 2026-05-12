@@ -1,22 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Filter, X, ChevronDown } from 'lucide-react';
+import { Filter, X, ChevronDown, Loader2 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import ProductCard from '../components/ProductCard';
+import ProductSkeleton from '../components/ProductSkeleton';
 
 const Shop = () => {
-    const { products, filterCategories: categories } = useData();
+    const { products, loadingProducts, filterCategories: categories } = useData();
     const [searchParams, setSearchParams] = useSearchParams();
     const categoryParam = searchParams.get('category');
 
     const [filteredProducts, setFilteredProducts] = useState(products);
+    const [displayLimit, setDisplayLimit] = useState(12); // Start with 12 for better fill
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState(categoryParam || 'All');
     const [priceRange, setPriceRange] = useState(2000);
     const [sortBy, setSortBy] = useState('default');
     const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-    // Sync category with URL
+
+    const loadMoreRef = useRef(null);
+
+
     useEffect(() => {
         if (categoryParam) {
             setSelectedCategory(categoryParam);
@@ -47,7 +53,29 @@ const Shop = () => {
         }
 
         setFilteredProducts([...result]);
+        setDisplayLimit(6);
     }, [selectedCategory, priceRange, sortBy, products]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !isFetchingMore && displayLimit < filteredProducts.length) {
+                    setIsFetchingMore(true);
+                    setTimeout(() => {
+                        setDisplayLimit(prev => prev + 6);
+                        setIsFetchingMore(false);
+                    }, 400);
+                }
+            },
+            { threshold: 0.1, rootMargin: '100px' }
+        );
+
+        if (loadMoreRef.current) {
+            observer.observe(loadMoreRef.current);
+        }
+
+        return () => observer.disconnect();
+    }, [displayLimit, filteredProducts.length, isFetchingMore]);
 
     const handleCategoryChange = (cat) => {
         setSelectedCategory(cat);
@@ -191,17 +219,18 @@ const Shop = () => {
 
                 {/* Product Grid */}
                 <div className="flex-1">
-                    {filteredProducts.length > 0 ? (
-                        <motion.div
-                            layout
-                            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-                        >
-                            <AnimatePresence>
-                                {filteredProducts.map(product => (
-                                    <ProductCard key={product._id || product.id} product={product} />
-                                ))}
-                            </AnimatePresence>
-                        </motion.div>
+                    {loadingProducts ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {[...Array(6)].map((_, i) => (
+                                <ProductSkeleton key={i} />
+                            ))}
+                        </div>
+                    ) : filteredProducts.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {filteredProducts.slice(0, displayLimit).map(product => (
+                                <ProductCard key={product._id || product.id} product={product} />
+                            ))}
+                        </div>
                     ) : (
                         <div className="text-center py-20">
                             <p className="text-gray-500 text-lg">No products found matching your criteria.</p>
@@ -213,6 +242,26 @@ const Shop = () => {
                             </button>
                         </div>
                     )}
+
+                    {/* Observer Sentinel & Loading indicator */}
+                    <div ref={loadMoreRef} className="py-12">
+                        {displayLimit < filteredProducts.length && (
+                            <div className="flex flex-col items-center justify-center gap-4">
+                                {isFetchingMore ? (
+                                    <div className="flex items-center gap-2 text-primary font-medium">
+                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                        <p className="text-sm">Bringing more furniture to you...</p>
+                                    </div>
+                                ) : (
+                                    <div className="h-px bg-gray-100 w-full relative">
+                                        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-xs text-gray-400 uppercase tracking-widest">
+                                            More items below
+                                        </span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

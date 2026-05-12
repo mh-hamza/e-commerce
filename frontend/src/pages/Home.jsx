@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import ProductCard from '../components/ProductCard';
+import ProductSkeleton from '../components/ProductSkeleton';
 
 const Home = () => {
     const { products, loadingProducts, features, categories } = useData();
@@ -16,7 +17,6 @@ const Home = () => {
             setShowLoader(false);
         }
 
-        // Fallback: If it doesn't load within 3 seconds, hide the loader anyway
         const timer = setTimeout(() => {
             setShowLoader(false);
         }, 3000);
@@ -24,16 +24,7 @@ const Home = () => {
         return () => clearTimeout(timer);
     }, [loadingProducts]);
 
-    const renderSkeletons = () => (
-        [1, 2, 3, 4].map((n) => (
-            <div key={n} className="flex flex-col gap-4 w-full">
-                <div className="w-full h-64 bg-gray-200 animate-pulse rounded-2xl"></div>
-                <div className="h-4 bg-gray-200 animate-pulse rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2"></div>
-                <div className="h-8 bg-gray-200 animate-pulse rounded w-full mt-2"></div>
-            </div>
-        ))
-    );
+
 
     if (showLoader) {
         return (
@@ -100,7 +91,13 @@ const Home = () => {
                             className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer"
                         >
                             <Link to={`/shop?category=${cat.name}`}>
-                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                {cat.image ? (
+                                    <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                ) : (
+                                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                                        No Image
+                                    </div>
+                                )}
                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
                                 <div className="absolute bottom-6 left-6 text-white">
                                     <h3 className="text-2xl font-bold mb-1">{cat.name}</h3>
@@ -121,7 +118,11 @@ const Home = () => {
                     </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {loadingProducts ? renderSkeletons() : featuredProducts.map((product) => (
+                    {loadingProducts ? (
+                        [...Array(4)].map((_, i) => (
+                            <ProductSkeleton key={i} />
+                        ))
+                    ) : featuredProducts.map((product) => (
                         <ProductCard key={product._id} product={product} />
                     ))}
                 </div>

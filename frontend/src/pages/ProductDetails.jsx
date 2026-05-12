@@ -12,21 +12,24 @@ import { useToast } from '../context/ToastContext';
 const ProductDetails = () => {
     const { products, loadingProducts } = useData();
     const { id } = useParams();
-    const product = products.find(p => p._id === id);
+    const product = products.find(p => (p._id || p.id) === id);
 
     const [quantity, setQuantity] = useState(1);
     const { addToCart } = useCart();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToast } = useToast();
 
-    const [selectedImage, setSelectedImage] = useState(product ? (product.images ? product.images[0] : product.image) : '');
+    const [selectedImage, setSelectedImage] = useState(null);
+    const placeholderImage = 'https://via.placeholder.com/600x600?text=Product+Image';
+    
+    const allImages = product ? [...new Set([product.image, ...(product.images || [])])].filter(img => img && img.trim() !== "") : [];
 
     // Scroll to top when id change
     useEffect(() => {
         window.scrollTo(0, 0);
         setQuantity(1);
         if (product) {
-            setSelectedImage(product.images ? product.images[0] : product.image);
+            setSelectedImage(allImages[0] || placeholderImage);
         }
     }, [id, product]);
 
@@ -94,16 +97,22 @@ const ProductDetails = () => {
                         animate={{ opacity: 1 }}
                         className="bg-gray-100 rounded-2xl overflow-hidden aspect-square md:h-[500px] w-full relative"
                     >
-                        <img src={selectedImage} alt={product.name} className="w-full h-full object-cover" />
+                        {selectedImage ? (
+                            <img src={selectedImage} alt={product.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
+                                No Image Available
+                            </div>
+                        )}
                         {product.isNew && (
                             <span className="absolute top-4 left-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-bold">NEW</span>
                         )}
                     </motion.div>
 
                     {/* Thumbnails */}
-                    {product.images && product.images.length > 1 && (
+                    {allImages.length > 1 && (
                         <div className="grid grid-cols-4 gap-4">
-                            {product.images.map((img, index) => (
+                            {allImages.map((img, index) => (
                                 <button
                                     key={index}
                                     onClick={() => setSelectedImage(img)}
