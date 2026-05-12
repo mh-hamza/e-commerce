@@ -122,8 +122,8 @@ const Home = () => {
                         [...Array(4)].map((_, i) => (
                             <ProductSkeleton key={i} />
                         ))
-                    ) : featuredProducts.map((product) => (
-                        <ProductCard key={product._id} product={product} />
+                    ) : featuredProducts.map((product, index) => (
+                        <ProductCard key={product._id} product={product} index={index} />
                     ))}
                 </div>
             </section>

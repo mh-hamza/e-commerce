@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useWishlist } from "../context/WishListContext";
 import { useCart } from "../context/CartContext";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, index = 10 }) => {
     const navigate = useNavigate();
     const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
     const { addToCart } = useCart();
@@ -13,17 +13,41 @@ const ProductCard = ({ product }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const imgRef = React.useRef();
 
+    // Determine if this image should be priority (LCP candidate)
+    const isPriority = index < 3;
+
+    // Image Optimization Logic
+    const getOptimizedUrl = (url) => {
+        if (!url) return "";
+        
+        // Cloudinary Optimization
+        if (url.includes('cloudinary.com')) {
+            // Inject auto format, auto quality, and resize
+            return url.replace('/upload/', '/upload/f_auto,q_auto,w_500,c_limit/');
+        }
+        
+        // Unsplash Optimization
+        if (url.includes('unsplash.com')) {
+            const separator = url.includes('?') ? '&' : '?';
+            return `${url}${separator}auto=format&q=75&w=500`;
+        }
+        
+        return url;
+    };
+
     React.useEffect(() => {
         if (imgRef.current && imgRef.current.complete) {
             setImageLoaded(true);
         }
     }, []);
 
+    const optimizedSrc = getOptimizedUrl(product.image);
+
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={isPriority ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            whileInView={isPriority ? undefined : { opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "100px" }}
             transition={{ duration: 0.4 }}
             whileHover={{ y: -5 }}
             className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 border border-gray-100 relative"
@@ -65,21 +89,26 @@ const ProductCard = ({ product }) => {
                 className="block relative aspect-[4/5] overflow-hidden bg-gray-100"
             >
                 {/* Image Skeleton */}
-                {!imageLoaded && (
+                {!imageLoaded && !isPriority && (
                     <div className="absolute inset-0 bg-gray-200 animate-pulse z-0"></div>
                 )}
                 
                 {product.image ? (
                     <img
                         ref={imgRef}
-                        src={product.image}
+                        src={optimizedSrc}
                         alt={product.name}
-                        loading="lazy"
-                        decoding="async"
+                        // LCP Optimization
+                        loading={isPriority ? "eager" : "lazy"}
+                        fetchpriority={isPriority ? "high" : "low"}
+                        decoding={isPriority ? "sync" : "async"}
+                        // CLS Optimization
+                        width="400"
+                        height="500"
                         onLoad={(e) => {
                             if (e.target.complete) setImageLoaded(true);
                         }}
-                        className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-10'}`}
+                        className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded || isPriority ? 'opacity-100 group-hover:scale-105' : 'opacity-10'}`}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">
