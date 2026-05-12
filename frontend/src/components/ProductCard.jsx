@@ -11,6 +11,13 @@ const ProductCard = ({ product }) => {
     const { addToCart } = useCart();
     const productId = product._id || product.id;
     const [imageLoaded, setImageLoaded] = useState(false);
+    const imgRef = React.useRef();
+
+    React.useEffect(() => {
+        if (imgRef.current && imgRef.current.complete) {
+            setImageLoaded(true);
+        }
+    }, []);
 
     return (
         <motion.div
@@ -64,12 +71,15 @@ const ProductCard = ({ product }) => {
                 
                 {product.image ? (
                     <img
+                        ref={imgRef}
                         src={product.image}
                         alt={product.name}
                         loading="lazy"
                         decoding="async"
-                        onLoad={() => setImageLoaded(true)}
-                        className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'}`}
+                        onLoad={(e) => {
+                            if (e.target.complete) setImageLoaded(true);
+                        }}
+                        className={`w-full h-full object-cover transition-all duration-500 relative z-10 ${imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-10'}`}
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-200 text-gray-400">

@@ -31,7 +31,6 @@ const Shop = () => {
         }
     }, [categoryParam]);
 
-    // Filter 
     useEffect(() => {
         let result = products;
 
@@ -53,8 +52,12 @@ const Shop = () => {
         }
 
         setFilteredProducts([...result]);
-        setDisplayLimit(6);
     }, [selectedCategory, priceRange, sortBy, products]);
+
+    // Only reset limit when core filters change
+    useEffect(() => {
+        setDisplayLimit(12);
+    }, [selectedCategory, priceRange, sortBy]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
