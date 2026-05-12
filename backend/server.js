@@ -21,6 +21,7 @@ app.use(
   cors({
     origin: [
       "https://saad-ecom-admin.netlify.app",
+      "https://saad-ecom-client.netlify.app",
       "http://localhost:5173",
       "http://localhost:5174"
     ],
