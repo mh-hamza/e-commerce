@@ -111,8 +111,9 @@ const Login = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="input-field py-3 bg-white pl-[40px]"
+                    className="input-field py-3 bg-white pl-10"
                     placeholder="Enter your email"
+                    style={{ paddingLeft: "2.5rem" }}
                   />
                 </div>
               </div>
@@ -141,8 +142,9 @@ const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="input-field pl-10 pr-10 py-3 bg-white"
+                    className="input-field pr-10 py-3 bg-white"
                     placeholder="Enter your password"
+                    style={{ paddingLeft: "2.5rem" }}
                   />
                   <button
                     type="button"
