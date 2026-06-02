@@ -22,13 +22,15 @@ const Products = () => {
   const [isDeleting, setIsDeleting] = useState(null);
 
   const handleEdit = (product) => {
-    navigate(`/admin/products/edit/${product.id}`, { state: { product } });
+    alert('🚫 Not Allowed');
+    // navigate(`/admin/products/edit/${product.id}`, { state: { product } });
   };
 
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      deleteProduct(id);
-    }
+    alert('🚫 Not Allowed');
+    // if (window.confirm('Are you sure you want to delete this product?')) {
+    //   deleteProduct(id);
+    // }
   };
 
 
@@ -48,7 +50,8 @@ const Products = () => {
           <p className="text-gray-500 text-sm mt-1">Manage your product inventory</p>
         </div>
         <button
-          onClick={() => navigate('/admin/products/add')}
+          onClick={() => alert('🚫 Not Allowed')}
+          // onClick={() => navigate('/admin/products/add')}
           className="flex items-center gap-2 px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-all hover:opacity-90 shadow-lg"
           style={{ background: 'linear-gradient(135deg, #8B5E3C, #6b4829)', boxShadow: '0 4px 14px rgba(139,94,60,0.35)' }}
         >

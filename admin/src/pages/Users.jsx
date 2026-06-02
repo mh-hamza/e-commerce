@@ -34,10 +34,11 @@ const Users = () => {
 
   const handleBlock = async (id, e) => {
     e.stopPropagation();
-    await toggleBlockUser(id);
-    if (selectedUser?._id === id) {
-      setSelectedUser(prev => prev ? { ...prev, isBlocked: !prev.isBlocked } : null);
-    }
+    alert('🚫 Not Allowed');
+    // await toggleBlockUser(id);
+    // if (selectedUser?._id === id) {
+    //   setSelectedUser(prev => prev ? { ...prev, isBlocked: !prev.isBlocked } : null);
+    // }
   };
 
   return (
@@ -114,8 +115,8 @@ const Users = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border ${user.isBlocked
-                          ? 'bg-red-50 text-red-700 border-red-100'
-                          : 'bg-green-50 text-green-700 border-green-100'
+                        ? 'bg-red-50 text-red-700 border-red-100'
+                        : 'bg-green-50 text-green-700 border-green-100'
                         }`}>
                         {user.isBlocked ? 'Blocked' : 'Active'}
                       </span>
@@ -125,8 +126,8 @@ const Users = () => {
                         onClick={(e) => handleBlock(user._id, e)}
                         title={user.isBlocked ? 'Unblock User' : 'Block User'}
                         className={`p-2 rounded-lg transition-colors ${user.isBlocked
-                            ? 'text-green-600 hover:bg-green-50'
-                            : 'text-red-500 hover:bg-red-50'
+                          ? 'text-green-600 hover:bg-green-50'
+                          : 'text-red-500 hover:bg-red-50'
                           }`}
                       >
                         {user.isBlocked ? <ShieldCheck size={18} /> : <ShieldOff size={18} />}
@@ -171,8 +172,8 @@ const Users = () => {
                       key={item}
                       onClick={() => goToPage(item)}
                       className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${item === currentPage
-                          ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
-                          : 'border border-gray-200 text-gray-600 hover:bg-white'
+                        ? 'bg-blue-600 text-white shadow-sm shadow-blue-500/30'
+                        : 'border border-gray-200 text-gray-600 hover:bg-white'
                         }`}
                     >
                       {item}
@@ -260,8 +261,8 @@ const Users = () => {
               <button
                 onClick={(e) => handleBlock(selectedUser._id, e)}
                 className={`w-full py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 ${selectedUser.isBlocked
-                    ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/20'
-                    : 'text-white shadow-lg'
+                  ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-500/20'
+                  : 'text-white shadow-lg'
                   }`}
                 style={!selectedUser.isBlocked ? { background: '#8B5E3C', boxShadow: '0 4px 14px rgba(139,94,60,0.35)' } : {}}
               >

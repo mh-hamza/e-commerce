@@ -38,67 +38,68 @@ const Coupons = () => {
 
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
-    if (!code || !discountPercentage) {
-      alert('Please fill all fields');
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      const res = await axios.post(`${API}/create`,
-        { code, discountPercentage: Number(discountPercentage) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (res.data.success) {
-        alert(res.data.message);
-        setCode('');
-        setDiscountPercentage('');
-        fetchCoupons(); // Refresh list
-      } else {
-        alert(res.data.message);
-      }
-    } catch (error) {
-      alert('Failed to create coupon');
-      console.error(error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    alert('🚫 Not Allowed');
+    // if (!code || !discountPercentage) {
+    //   alert('Please fill all fields');
+    //   return;
+    // }
+    // try {
+    //   setIsSubmitting(true);
+    //   const res = await axios.post(`${API}/create`,
+    //     { code, discountPercentage: Number(discountPercentage) },
+    //     { headers: { Authorization: `Bearer ${token}` } }
+    //   );
+    //   if (res.data.success) {
+    //     alert(res.data.message);
+    //     setCode('');
+    //     setDiscountPercentage('');
+    //     fetchCoupons();
+    //   } else {
+    //     alert(res.data.message);
+    //   }
+    // } catch (error) {
+    //   alert('Failed to create coupon');
+    //   console.error(error);
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const handleToggleStatus = async (id) => {
-    try {
-      const res = await axios.put(`${API}/toggle/${id}`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data.success) {
-        alert(res.data.message);
-        setCoupons(coupons.map(c => c._id === id ? { ...c, isActive: !c.isActive } : c));
-      } else {
-        alert(res.data.message);
-      }
-    } catch (error) {
-      alert('Failed to toggle status');
-      console.error(error);
-    }
+    alert('🚫 Not Allowed');
+    // try {
+    //   const res = await axios.put(`${API}/toggle/${id}`, {}, {
+    //     headers: { Authorization: `Bearer ${token}` }
+    //   });
+    //   if (res.data.success) {
+    //     alert(res.data.message);
+    //     setCoupons(coupons.map(c => c._id === id ? { ...c, isActive: !c.isActive } : c));
+    //   } else {
+    //     alert(res.data.message);
+    //   }
+    // } catch (error) {
+    //   alert('Failed to toggle status');
+    //   console.error(error);
+    // }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this coupon?')) return;
-    try {
-      const res = await axios.delete(`${API}/delete/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.data.success) {
-        alert(res.data.message);
-        setCoupons(coupons.filter(c => c._id !== id));
-      } else {
-        alert(res.data.message);
-      }
-    } catch (error) {
-      alert('Failed to delete coupon');
-      console.error(error);
-    }
+    alert('🚫 Not Allowed');
+    // if (!window.confirm('Are you sure you want to delete this coupon?')) return;
+    // try {
+    //   const res = await axios.delete(`${API}/delete/${id}`, {
+    //     headers: { Authorization: `Bearer ${token}` }
+    //   });
+    //   if (res.data.success) {
+    //     alert(res.data.message);
+    //     setCoupons(coupons.filter(c => c._id !== id));
+    //   } else {
+    //     alert(res.data.message);
+    //   }
+    // } catch (error) {
+    //   alert('Failed to delete coupon');
+    //   console.error(error);
+    // }
   };
 
   return (
@@ -195,8 +196,8 @@ const Coupons = () => {
                       <button
                         onClick={() => handleToggleStatus(coupon._id)}
                         className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${coupon.isActive
-                            ? 'border-yellow-200 text-yellow-600 hover:bg-yellow-50'
-                            : 'border-green-200 text-green-600 hover:bg-green-50'
+                          ? 'border-yellow-200 text-yellow-600 hover:bg-yellow-50'
+                          : 'border-green-200 text-green-600 hover:bg-green-50'
                           }`}
                       >
                         <Power size={16} /> {coupon.isActive ? 'Deactivate' : 'Activate'}

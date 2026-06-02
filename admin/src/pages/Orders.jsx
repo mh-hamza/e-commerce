@@ -89,7 +89,8 @@ const Orders = () => {
                     <td className="px-6 py-4">
                       <select 
                         value={order.status}
-                        onChange={(e) => updateOrderStatus(order._id, e.target.value)}
+                        onChange={(e) => alert('🚫 Not Allowed')}
+                        // onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                         className={`text-xs font-medium border rounded-full px-2.5 py-1 focus:outline-none ${getStatusColor(order.status)}`}
                       >
                         <option value="Processing">Processing</option>
@@ -260,10 +261,11 @@ const Orders = () => {
                     {['Processing', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'].map(status => (
                       <button
                         key={status}
-                        onClick={() => {
-                          updateOrderStatus(selectedOrder._id, status);
-                          setSelectedOrder({...selectedOrder, status});
-                        }}
+                        onClick={() => alert('🚫 Not Allowed')}
+                        // onClick={() => {
+                        //   updateOrderStatus(selectedOrder._id, status);
+                        //   setSelectedOrder({...selectedOrder, status});
+                        // }}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border ${
                           selectedOrder.status === status 
                             ? 'bg-blue-600 text-white border-blue-600 shadow-md shadow-blue-500/20' 
