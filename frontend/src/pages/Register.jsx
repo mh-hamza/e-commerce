@@ -63,7 +63,7 @@ const Register = () => {
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700">Email Address</label>
+                        <label className="text-sm font-bold text-gray-700">Phone No. </label>
                         <div className="relative">
                             <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                             <input
